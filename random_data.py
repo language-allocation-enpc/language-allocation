@@ -40,55 +40,35 @@ def generate_random_course_list():
         id+=1
     return result
 
-def generate_vow_dic(courses):
-    vow_dic = {}
-    current_id = 1
-    for course_1 in courses:
-        for course_2 in courses:
-            vow_1_2 = vow()
-            vow_1_2.courses = [course_1, course_2]
-            vow_1_2.nb_courses = 2
-            if vow_1_2 not in vow_dic.values() and course_1 != course_2:
-                vow_1_2.id = current_id
-                vow_dic[vow_1_2.id] = vow_1_2
-                current_id += 1
-            for course_3 in courses:
-                vow_1_2_3 = vow()
-                vow_1_2_3.courses = [course_1, course_2, course_3]
-                vow_1_2_3.nb_courses = 3
-                if vow_1_2_3 not in vow_dic.values() and course_1 != course_2 and course_1 != course_3 and course_2 != course_3:
-                    vow_1_2_3.id = current_id
-                    vow_dic[vow_1_2_3.id] = vow_1_2_3
-                    current_id += 1
-    return vow_dic
 
-def add_implicit_vows(student, vow_dic):
-    original_vows = student.vows.copy()
-    for vow in vow_dic.values():
-        if vow not in original_vows:
-            student.vows += [vow]
-
-
-def generate_random_vow(courses, vow_dic):
-    return rd.choice(list(vow_dic.values()))
-
-
-def generate_random_student(courses, vow_dic):
-    result = student()
-    result.name = generate_random_name()
-    nb_vows = rd.randint(1,30)
-    for i in range(nb_vows):
-        current_vow = generate_random_vow(courses, vow_dic)
-        result.vows.append(current_vow)
-    add_implicit_vows(result, vow_dic)
+def generate_random_vow(courses, nb_courses_in_vow=3): #generates a vow with nb_courses_in_vow courses
+    result = vow()
+    random_distinct_courses=[]
+    for i in range(nb_courses_in_vow):
+        random_course=rd.choice(courses)
+        while( random_course in random_distinct_courses):
+            random_course=rd.choice(courses)
+        random_distinct_courses.append(random_course)
+    random_distinct_courses.sort(key=lambda x: x.id) #sorts the list of courses by id
+    result.courses=random_distinct_courses
+    result.nb_courses=len(random_distinct_courses)
     return result
 
 
-def generate_random_population(courses, vow_dic, size):
-    return [generate_random_student(courses, vow_dic) for i in range(size)]
+def generate_random_student(courses, nb_vows, nb_courses_in_vow):
+    result = student()
+    result.name = generate_random_name()
+    for i in range(nb_vows):
+        current_vow = generate_random_vow(courses, nb_courses_in_vow)
+        result.vows.append(current_vow)
+    return result
 
 
-if __name__ == '__main__':
+def generate_random_population(courses, nb_vows, nb_courses_in_vow, size):
+    return [generate_random_student(courses, nb_vows, nb_courses_in_vow) for i in range(size)]
+
+
+"""if __name__ == '__main__':
     POP_SIZE = 50
     courses = generate_random_course_list()
     population = generate_random_population(courses, POP_SIZE)
@@ -96,4 +76,4 @@ if __name__ == '__main__':
         print(stu.name)
         for vow in stu.vows:
             print(str([vow.courses[i].name for i in range(len(vow.courses))])+' , '+ str(vow.weight))
-        print('\n')
+        print('\n')"""

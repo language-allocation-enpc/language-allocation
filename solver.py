@@ -4,17 +4,15 @@ import random as rd
 from utils import *
 
 
-
 #Generating data
-NB_STUDENTS = rd.randint(15, 30)
+NB_STUDENTS = 40
 COURSES = generate_random_course_list()
-VOWS = generate_vow_dic(COURSES)
-STUDENTS = generate_random_population(COURSES, VOWS, NB_STUDENTS)
+NB_VOWS = 5
+NB_COURSES_IN_VOW=3
+#VOWS = generate_vow_dic(COURSES)
+STUDENTS = generate_random_population(COURSES, NB_VOWS, NB_COURSES_IN_VOW, NB_STUDENTS)
 
-for student in STUDENTS:
-    print([v.id for v in student.vows])
-NB_VOWS = len(VOWS)
-print('done with generating')
+
 #indexing the set of students
 S=range(len(STUDENTS))
 
@@ -64,5 +62,5 @@ for student, vow in SxV:
         result[student]=vow
 
 ## results display
-
+print(result)
 print("Total cost = ", assignment_model.vobj())
