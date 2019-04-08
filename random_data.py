@@ -34,7 +34,7 @@ def generate_random_course(last_id):
 def generate_random_course_list():
     id = 0
     result = []
-    result_size = rd.randint(10,15)
+    result_size = 50
     for i in range(result_size):
         result.append(generate_random_course(id))
         id+=1

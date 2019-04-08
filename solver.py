@@ -5,7 +5,7 @@ from utils import *
 
 
 #Generating data
-NB_STUDENTS = 40
+NB_STUDENTS = 300
 COURSES = generate_random_course_list()
 NB_VOWS = 5
 NB_COURSES_IN_VOW=3
