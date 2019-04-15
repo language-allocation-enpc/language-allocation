@@ -386,7 +386,7 @@ def login_service():
         session["user_id"] = student["id"]
 
         html_code = 200
-        res = make_response(redirect("http://www.facebook.com/"))
+        res = make_response(redirect("http://www.localhost:3000/"))
 
         return res, html_code
     else:
