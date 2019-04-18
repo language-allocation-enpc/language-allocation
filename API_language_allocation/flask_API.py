@@ -2,6 +2,7 @@ from flask import Flask
 from flask import jsonify
 from flask import request, session, url_for, redirect, make_response
 from flask_pymongo import PyMongo
+from flask_login import LoginManager, current_user, login_user, logout_user, login_required, UserMixin
 from bson.objectid import ObjectId
 import bson.json_util
 import json
@@ -12,22 +13,82 @@ from ast import literal_eval
 from flask_cors import CORS, cross_origin
 import data_structs
 from solver import *
+from flask_bcrypt import Bcrypt
+from flask_jwt_extended import JWTManager
+from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 
-site_url = 'localhost'
+site_url = 'http://localhost:3000/'
 
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*":{"origins": site_url}})
 
 
-
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
 
 app.config['MONGO_DBNAME'] = 'language_allocation_database'
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/language_allocation_database'
-app.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy dog'
+app.config['SECRET_KEY'] = '6Cb4CTv46t39GYncwkmTEbcjs9415fskfnR'
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 mongo = PyMongo(app)
+
+bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
+
+
+@app.route('/admin/login', methods=['POST'])
+@cross_origin(origin=site_url,headers=['Content-Type','Authorization'])
+def login():
+    users = mongo.db.users
+    email = request.get_json(force=True)['email']
+    password = request.get_json(force=True)['password']
+    result = ""
+
+    response = users.find_one({'type': 'admin', 'email' : email})
+
+    if response:
+        if bcrypt.check_password_hash(response['password'], password):
+            access_token = create_access_token(identity = {
+			    'first_name': response['first_name'],
+				'last_name': response['last_name'],
+				'email': response['email']}
+				)
+            result = access_token
+        else:
+            result = jsonify({"error":"Invalid username and password"})
+    else:
+        result = jsonify({"result":"No results found"})
+    return result
+
+
+@app.route('/admin/register', methods=['POST'])
+def register():
+    users = mongo.db.users
+    first_name = request.get_json(force=True)['first_name']
+    last_name = request.get_json(force=True)['last_name']
+    email = request.get_json(force=True)['email']
+    password = bcrypt.generate_password_hash(request.get_json(force=True)['password']).decode('utf-8')
+
+    user_id = users.insert({
+	'first_name' : first_name,
+	'last_name' : last_name,
+	'email' : email,
+	'password' : password
+	})
+    new_user = users.find_one({'_id' : user_id})
+
+    result = {'email' : new_user['email'] + ' registered'}
+
+    return jsonify({'result' : result})
+
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User(user_id)
 
 
 def get_max_collection_id(collection):
@@ -366,9 +427,16 @@ def add_student():
 @cross_origin(origin=site_url,headers=['Content-Type','Authorization'])
 def update_student_vows(student_id):
     users = mongo.db.users
+    new_name = request.get_json(force=True)['name']
+    new_email = request.get_json(force=True)['email']
     new_vows = request.get_json(force=True)['vows']
-    student_updated = users.update({"id":int(student_id)}, {"vows": new_vows})
+    student_updated = users.update_one({"id":int(student_id)}, {"$set" : {"id":int(student_id),
+                                                           "name":new_name,
+                                                           "email":new_email,
+                                                           "vows":new_vows}})
     if student_updated:
+        output = {}
+        output["id"] = student_id
         html_code = 200
     else:
         output = "Could not add student"
@@ -376,19 +444,16 @@ def update_student_vows(student_id):
     return jsonify({'result': output}), html_code
 
 
-@app.route('/login/')
+@app.route('/login/<token>')
 @cross_origin(origin=site_url,headers=['Content-Type','Authorization'])
-def login_service():
-    token = request.args.get('id')
+def login_service(token):
     users = mongo.db.users
     student = users.find_one({"token" : token})
     if student:
-        session["user_id"] = student["id"]
-
+        output = student["id"]
+        session['token']=token
         html_code = 200
-        res = make_response(redirect("http://www.localhost:3000/"))
-
-        return res, html_code
+        return get_student_by_id(output)
     else:
         output = "No matching student for this token"
         html_code = 400
@@ -428,7 +493,9 @@ def solve_courses():
     solve(courses, students)
     for student in students:
         mongo.db.users.update_one({"id" : student.id}, {"$set":{"courses" : [c.to_dict() for c in student.courses]}})
-    return jsonify(students), 400
+    return jsonify(students), 200
+
+
 
 
 

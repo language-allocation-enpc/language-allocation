@@ -1,6 +1,7 @@
 import json
 from pymongo import MongoClient
 from data_structs import *
+import random, string
 client = MongoClient()
 
 app_db = client.language_allocation_database
@@ -147,6 +148,8 @@ def write_student(id=-1, name='', vows=[]):
     student["vows"] = vows
     student["courses"] = []
     student["type"] = "student"
+    student["email"] = ''
+    student["token"] = ''.join(random.choices(string.ascii_uppercase +string.ascii_lowercase+ string.digits, k=35))
     app_db.users.insert_one(student)
 for i in range(10):
     vow_1 = vow()

@@ -1,6 +1,6 @@
 from pymprog import *
 import numpy as np
-from random_data import *
+
 import random as rd
 
 
@@ -9,6 +9,7 @@ PROD_MODE = True
 
 if FALSE_DATA_MODE:
     #Generating data
+    from random_data import *
     NB_STUDENTS = 300
     COURSES = generate_random_course_list(50)
     NB_VOWS = 3

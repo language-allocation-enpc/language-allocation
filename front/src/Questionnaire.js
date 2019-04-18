@@ -4,15 +4,33 @@ import dummyData from "./DummyData";
 import url from "./url";
 import error_panel from './images/error_panel.png';
 import './Questionnaire.css';
+import queryString from 'query-string'
+import Cookies from 'js-cookie';
 
 class Questionnaire extends Component {
     constructor(props) {
         super(props);
-        this.state = { data: {courses: dummyData, schedules: []}, is_loaded: false, step_list: ["initial_questions"], step_index: 0, answers_are_sent: false,answers: { year: '', TOEIC: '', justification_no_english: '', justification_no_english_text: '', number_english_courses: 1, number_other_courses: 0, english_courses_ranking:[], other_courses_ranking:[]}};
+        this.state = { data: {courses: dummyData, schedules: [], user_id: null, user_name: null, user_vows: null}, is_loaded: false, step_list: ["initial_questions"], step_index: 0, answers_are_sent: false,answers: { year: '', TOEIC: '', justification_no_english: '', justification_no_english_text: '', number_english_courses: 1, number_other_courses: 0, english_courses_ranking:[], other_courses_ranking:[]}};
+
       }
 
+    getUser(key){
+      let res = Cookies.get('user_'+key);
+      return res
+    }
 
     componentDidMount(){
+      let new_state=this.state;
+      new_state.data.user_name=window.sessionStorage.getItem("name");
+      new_state.data.user_email = window.sessionStorage.getItem("email");
+      new_state.data.vows=window.sessionStorage.getItem("vows");
+      new_state.is_loaded=true
+      this.setState({
+        new_state
+      });
+
+
+
       axios.get(url+"courses/")
       .then(
         (result) => {
@@ -60,9 +78,11 @@ class Questionnaire extends Component {
       step_list.push("final_question")
       return step_list
     }
-    
+
     getStepIndex=()=>{return this.state.step_index;}
-    
+
+    getUserName=()=>{return this.state.data.user_name;}
+
     handleStepChange = (direction) => {
       if(direction==="previous"&&this.state.step_index>0){
         this.setState({step_index: this.state.step_index-1});
@@ -100,47 +120,48 @@ class Questionnaire extends Component {
         let step=null;
         let current_step_name=this.state.step_list[this.state.step_index];
         if(current_step_name==="initial_questions"){
-          step=<InitialQuestions 
+          step=<InitialQuestions
           getStepIndex={this.getStepIndex}
+          getUserName = {this.getUserName}
           handleStepChange={this.handleStepChange}
           getStepList={this.getStepList}
-          setStepList={this.setStepList} 
+          setStepList={this.setStepList}
           getAnswers={this.getAnswers}
           setAnswers={this.setAnswers}
           />;
         }else if(current_step_name==="ranking_english_courses"){
           let list_english_courses=data.courses.filter(function(value, index, arr){return value.language==="Anglais";});
-          step=<CourseRankingQuestion 
+          step=<CourseRankingQuestion
           instructions="Veuillez ordonner les cours d'Anglais par ordre de préférence"
-          courses={list_english_courses} 
+          courses={list_english_courses}
           key="english_courses_ranking"
           answer="english_courses_ranking"
           getStepIndex={this.getStepIndex}
           handleStepChange={this.handleStepChange}
           getStepList={this.getStepList}
-          setStepList={this.setStepList} 
+          setStepList={this.setStepList}
           getAnswers={this.getAnswers}
           setAnswers={this.setAnswers}
           getSchedules={this.getSchedules}
           />;
         }else if(current_step_name==="ranking_other_courses"){
           let list_other_courses=data.courses.filter(function(value, index, arr){return value.language!=="Anglais";});
-          step=<CourseRankingQuestion 
+          step=<CourseRankingQuestion
           instructions="Veillez classer les autres cours par ordre de préférence"
-          courses={list_other_courses} 
+          courses={list_other_courses}
           key="other_courses_ranking"
           answer="other_courses_ranking"
           getStepIndex={this.getStepIndex}
           handleStepChange={this.handleStepChange}
           getStepList={this.getStepList}
-          setStepList={this.setStepList} 
+          setStepList={this.setStepList}
           getAnswers={this.getAnswers}
           setAnswers={this.setAnswers}
           getSchedules={this.getSchedules}
           />;
         }else if(current_step_name==="final_question"){
             step=<FinalQuestion
-            instructions="Ce questionnaire est maintenant terminé. Veuillez envoyer vos réponses pour que celles-ci soient prises en compte." 
+            instructions="Ce questionnaire est maintenant terminé. Veuillez envoyer vos réponses pour que celles-ci soient prises en compte."
             key="final-question"
             getStepIndex={this.getStepIndex}
             handleStepChange={this.handleStepChange}
@@ -226,7 +247,7 @@ class InitialQuestions extends Component {
       ]
       );
     }
-    let instructions="Veuillez répondre aux questions suivantes. Il vous sera demandé de classer les cours par ordre de préférence dans la suite du questionnaire.";
+    let instructions="Bienvenue "+this.props.getUserName()+". Veuillez répondre aux questions suivantes. Il vous sera demandé de classer les cours par ordre de préférence dans la suite du questionnaire.";
     if(this.state.error_messages.length>0){
       instructions=this.state.error_messages;
     }
@@ -243,7 +264,7 @@ class InitialQuestions extends Component {
             className="questionnaire-form-select"
             value={this.props.getAnswers().year}
             onChange={this.handleInputChange} >
-            <option value="" selected disabled hidden>Choisir</option>
+            <option value="" disabled hidden>Choisir</option>
             <option value='1A'>1A</option>
             <option value='2/3A'>2/3A</option>
             <option value='Cycle Master'>Cycle Master</option>
@@ -257,7 +278,7 @@ class InitialQuestions extends Component {
             className="questionnaire-form-select"
             value={this.props.getAnswers().TOEIC}
             onChange={this.handleInputChange} >
-            <option value="" selected disabled hidden>Choisir</option>
+            <option value="" disabled hidden>Choisir</option>
             <option value='moins de 650'>moins de 650</option>
             <option value='entre 650 et 785'>entre 650 et 785</option>
             <option value='plus de 785'>plus de 785</option>
@@ -362,7 +383,7 @@ class CourseRankingQuestion extends Component {
           <div className="question-content">
               <CourseList courses={this.props.courses} handleAddCourseToRanking={this.handleAddCourseToRanking} getSchedules={this.props.getSchedules}/>
               <CourseRanking ranking= {this.getRanking()} handleRankUp={this.handleRankUp} handleRankDown={this.handleRankDown} handleDeletionFromRanking={this.handleDeletionFromRanking} getSchedules={this.props.getSchedules}/>
-          </div>   
+          </div>
           <QuestionFooter handleStepChange={this.props.handleStepChange} getStepList={this.props.getStepList} getStepIndex={this.props.getStepIndex} verificationFunction={this.verificationFunction}/>
         </div>
       );
@@ -381,7 +402,7 @@ class CourseRanking extends Component {
             );
         }
       return (
-      <div className="course-ranking"><h1 className="course-ranking-header">Mon classement</h1>{ranking_display.length===0 ? 
+      <div className="course-ranking"><h1 className="course-ranking-header">Mon classement</h1>{ranking_display.length===0 ?
         <div className="ranking-instructions"><p>Les cours que vous ajouterez au classement s'afficheront ici.</p><p> (De haut en bas par ordre de préférence décroissante)</p><p>Seuls les cours que vous avez classés pourront vous être attibués.</p><p>ATTENTION ! Veillez à classer suffisamment de cours pour être certain(e) d'en avoir en cas de forte demande de vos premiers choix.</p><p>Vous ne maximisez pas vos chances d'avoir vos cours préférés en en classant peu, au contraire, vous augmentez celles d'avoir moins de cours que vous ne le souhaitiez !</p></div>:
         <CourseBoxList content={ranking_display}/>}</div>
       );
@@ -405,7 +426,7 @@ class FinalQuestion extends Component {
                 <FinalButton text={"Envoyer les réponses"} onClick={this.props.sendAnswers}/>
                 <FinalButton text={"Annuler le questionnaire"}/>
                 </div>}
-            </div>   
+            </div>
             {this.props.getAnswersAreSent() ? null : <QuestionFooter handleStepChange={this.props.handleStepChange} getStepList={this.props.getStepList} getStepIndex={this.props.getStepIndex}/>}
           </div>
         );
@@ -482,7 +503,7 @@ class CourseList extends Component {
                 <Button text="ajouter au classement" onClick={()=>this.props.handleAddCourseToRanking(list_courses_to_display[index])}/>
                 ]}/>
             );
-        } 
+        }
       return (
         <div className="course-list">
           <h1 className="course-list-header">Liste des cours</h1>
@@ -506,7 +527,7 @@ class CourseListFilter extends Component {
         } else {
           list_options.push(<option value={option_name} key={option_name}>{schedules[option_name].day+(schedules[option_name].day==="hors-créneaux"? "":(" "+schedules[option_name].begin+"-"+schedules[option_name].end))}</option>);
         }
-        
+
       }
       criteria_selection.push(
         <div className="course-list-filter-option" key={criterion}>
@@ -519,11 +540,11 @@ class CourseListFilter extends Component {
             {list_options}
           </select>
       </div>
-        
+
       );
     }
-    
-    
+
+
   return (
     <div className="course-list-filter">{criteria_selection}</div>
   );
@@ -603,7 +624,7 @@ class FinalButton extends Component {
     }
   }
 
-  
+
 class ErrorMessage extends Component {
   render() {
     return (
