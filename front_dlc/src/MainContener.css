@@ -1,0 +1,25 @@
+.course_info{
+    overflow-y: scroll;
+    margin: 1vh 1vw;
+    border: 0.01em solid #ccc;
+    border-radius: 0.5em;
+    background-color: white;
+    text-align: center;
+    display:grid;
+    grid-template: 10fr 1fr;
+    grid-template-columns: 10fr 1fr;
+}
+
+.name{
+    text-align: center;
+}
+
+.cours_L{
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr
+}
+
+.Button{
+    size: fit-content;
+    font-size: large;
+}
