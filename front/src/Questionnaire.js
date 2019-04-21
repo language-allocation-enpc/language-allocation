@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import dummyData from "./DummyData";
 import url from "./url";
+import vowGenerator from "./VowGenerator";
 import error_panel from './images/error_panel.png';
 import './Questionnaire.css';
 import queryString from 'query-string'
@@ -10,7 +11,7 @@ import Cookies from 'js-cookie';
 class Questionnaire extends Component {
     constructor(props) {
         super(props);
-        this.state = { data: {courses: dummyData, schedules: [], user_id: null, user_name: null, user_vows: null}, is_loaded: false, step_list: ["initial_questions"], step_index: 0, answers_are_sent: false,answers: { year: '', TOEIC: '', justification_no_english: '', justification_no_english_text: '', number_english_courses: 1, number_other_courses: 0, english_courses_ranking:[], other_courses_ranking:[]}};
+        this.state = { data: {courses: dummyData, schedules: [], user_id: null, user_name: null, user_vows: null}, is_loaded: false, step_list: ["initial_questions"], step_index: 0, answers_are_sent: false, answers: { year: '', TOEIC: '', justification_no_english: '', justification_no_english_text: '', number_english_courses: 1, number_other_courses: 0, english_courses_ranking:[], other_courses_ranking:[]}};
 
       }
 
@@ -107,8 +108,13 @@ class Questionnaire extends Component {
     }
 
     sendAnswers=()=>{
-        //ajouter requête
-        this.setState({answers_are_sent: true});
+      let answers=this.state.answers;
+      let user_vows=vowGenerator(answers.number_english_courses, answers.number_other_courses, answers.english_courses_ranking, answers.other_courses_ranking, this.state.data.schedules)
+      let new_state=this.state;
+      new_state.data.user_vows=user_vows;
+      this.setState(new_state);
+      console.log(user_vows)
+      this.setState({answers_are_sent: true})
     }
 
     getSchedules = ()=>{
@@ -186,7 +192,7 @@ class InitialQuestions extends Component {
 
   handleInputChange= (event) => {
     const target = event.target;
-    const value = target.type === 'number' ? Math.max(target.value, 0) : (target.type==='text' ? target.value.substring(0,200) : target.value);
+    const value = target.type === 'number' ? Math.min(Math.max(target.value, 0), 4) : (target.type==='text' ? target.value.substring(0,200) : target.value);
     const name = target.name;
 
     let new_answers= this.props.getAnswers();
@@ -396,9 +402,9 @@ class CourseRanking extends Component {
         for(let index=0; index<this.props.ranking.length; index++){
             ranking_display.push(
             <CourseBox key={index} course={this.props.ranking[index]} getSchedules={this.props.getSchedules} buttons={[
-                <Button text="monter" onClick={()=>this.props.handleRankUp(index)}/>,
-                <Button text="descendre" onClick={()=>this.props.handleRankDown(index)}/>,
-                <Button text="supprimer" onClick={()=>this.props.handleDeletionFromRanking(index)}/>]}/>
+                <Button text="monter" onClick={()=>this.props.handleRankUp(index)} key="monter"/>,
+                <Button text="descendre" onClick={()=>this.props.handleRankDown(index)} key="descendre"/>,
+                <Button text="supprimer" onClick={()=>this.props.handleDeletionFromRanking(index)} key="supprimer"/>]}/>
             );
         }
       return (
@@ -500,7 +506,7 @@ class CourseList extends Component {
         for(let index=0; index<list_courses_to_display.length; index++){
             list_display.push(
             <CourseBox key={index} course={list_courses_to_display[index]} getSchedules={this.props.getSchedules} buttons={[
-                <Button text="ajouter au classement" onClick={()=>this.props.handleAddCourseToRanking(list_courses_to_display[index])}/>
+                <Button text="ajouter au classement" onClick={()=>this.props.handleAddCourseToRanking(list_courses_to_display[index])} key="ajouter"/>
                 ]}/>
             );
         }
