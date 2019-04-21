@@ -301,7 +301,7 @@ class InitialQuestions extends Component {
           <br/>
         {additionnal_question_about_english_courses}
         <label>
-          Combien de créneaux de langues différentes de l'anglais souhaitez-vous suivre ?</label>
+          Combien de cours de langues différentes de l'anglais souhaitez-vous suivre ?</label>
           <input
             name="number_other_courses"
             type="number"

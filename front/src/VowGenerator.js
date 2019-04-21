@@ -44,15 +44,23 @@ function coursesAreOverlapping(course1, course2, schedules){
     return are_overlapping;
 }
 
-function vowIsValid(vow, schedules){
-    // checking for schedules compatibility 
+function vowIsValid(vow, schedules){ 
     let list_courses=vow.list;
+     // checking for schedules compatibility
     for( let i=0; i<list_courses.length; i++){
         for(let j =i+1; j<list_courses.length; j++){
             if(coursesAreOverlapping(list_courses[i], list_courses[j], schedules)){
                 return false;
             }
         }
+    }
+    // checking that there are at most two different languages
+    let language_map={};
+    for(let i=0; i<list_courses.length; i++){
+        language_map[list_courses[i].language]=true;
+    }
+    if(Object.keys(language_map).length>2){
+        return false;
     }
     return true;
 }
@@ -91,6 +99,11 @@ function vowIsValid(vow, schedules){
   }
   
   function mix(result_1, result_2){
+    if(result_1.length===0){
+        return result_2;
+    } else if(result_2.length){
+        return result_1;
+    }
     let result=[]
     for (let i= 0; i<Object.keys(result_1).length; i++){
       for (let j = 0; j<Object.keys(result_2).length; j++){
