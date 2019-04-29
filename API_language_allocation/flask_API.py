@@ -8,6 +8,7 @@ import bson.json_util
 import json
 import pymongo
 import random
+import datetime
 import string
 from ast import literal_eval
 from flask_cors import CORS, cross_origin
@@ -16,7 +17,7 @@ from solver import *
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
-
+from flask_mail import Mail
 site_url = 'http://localhost:3000/'
 
 
@@ -32,15 +33,15 @@ app.config['MONGO_DBNAME'] = 'language_allocation_database'
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/language_allocation_database'
 app.config['SECRET_KEY'] = '6Cb4CTv46t39GYncwkmTEbcjs9415fskfnR'
 app.config['CORS_HEADERS'] = 'Content-Type'
-
+app.config['JWT_SECRET_KEY'] = 'WkDHlzbF3d6kWOGQcZvKudFjsJNeSOFY'
 mongo = PyMongo(app)
 
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
-
+mail = Mail(app)
 
 @app.route('/admin/login', methods=['POST'])
-@cross_origin(origin=site_url,headers=['Content-Type','Authorization'])
+@cross_origin(origin=site_url, headers=['Content-Type','Authorization'], supports_credentials=True)
 def login():
     users = mongo.db.users
     email = request.get_json(force=True)['email']
@@ -52,37 +53,42 @@ def login():
     if response:
         if bcrypt.check_password_hash(response['password'], password):
             access_token = create_access_token(identity = {
-			    'first_name': response['first_name'],
-				'last_name': response['last_name'],
+			    'name': response['name'],
 				'email': response['email']}
 				)
-            result = access_token
+
+            result = jsonify({"token":access_token})
         else:
             result = jsonify({"error":"Invalid username and password"})
     else:
-        result = jsonify({"result":"No results found"})
+        result = jsonify({"error":"No results found"})
     return result
 
+@app.route('/admin/check-auth', methods=['GET'])
+@cross_origin(origin=site_url,headers=['Content-Type','Authorization'], supports_credentials=True)
+@jwt_required
+def check_auth():
+    return jsonify({"state":"true"})
 
-@app.route('/admin/register', methods=['POST'])
-def register():
-    users = mongo.db.users
-    first_name = request.get_json(force=True)['first_name']
-    last_name = request.get_json(force=True)['last_name']
-    email = request.get_json(force=True)['email']
-    password = bcrypt.generate_password_hash(request.get_json(force=True)['password']).decode('utf-8')
-
-    user_id = users.insert({
-	'first_name' : first_name,
-	'last_name' : last_name,
-	'email' : email,
-	'password' : password
-	})
-    new_user = users.find_one({'_id' : user_id})
-
-    result = {'email' : new_user['email'] + ' registered'}
-
-    return jsonify({'result' : result})
+# @app.route('/admin/register', methods=['POST'])
+# def register():
+#     users = mongo.db.users
+#     first_name = request.get_json(force=True)['first_name']
+#     last_name = request.get_json(force=True)['last_name']
+#     email = request.get_json(force=True)['email']
+#     password = bcrypt.generate_password_hash(request.get_json(force=True)['password']).decode('utf-8')
+#
+#     user_id = users.insert({
+# 	'first_name' : first_name,
+# 	'last_name' : last_name,
+# 	'email' : email,
+# 	'password' : password
+# 	})
+#     new_user = users.find_one({'_id' : user_id})
+#
+#     result = {'email' : new_user['email'] + ' registered'}
+#
+#     return jsonify({'result' : result})
 
 
 
@@ -377,28 +383,6 @@ def get_student_by_id(student_id):
         html_code = 400
     return jsonify({'result': output}), html_code
 
-@app.route('/users/students/', methods=['GET'])
-@cross_origin(origin=site_url,headers=['Content-Type','Authorization'])
-def get_student_by_session():
-    users = mongo.db.users
-    try:
-        current_id = session["id"]
-    except:
-        res = make_response("Error 300 : Unauthorized Access")
-
-        return res, html_code
-    student = users.find_one({"type": "student", "id": int(session["id"])})
-    if student:
-        output={}
-        output["id"] = student["id"]
-        output["name"] = student["name"]
-        output["email"] = student["email"]
-        output["vows"] = student["vows"]
-        html_code = 200
-    else:
-        output = "No matching student for id " + str(student_id)
-        html_code = 400
-    return jsonify({'result': output}), html_code
 
 @app.route('/users/students/', methods=['PUT'])
 @cross_origin(origin=site_url,headers=['Content-Type','Authorization'])
@@ -425,7 +409,7 @@ def add_student():
 
 @app.route('/users/students/<student_id>', methods=['POST'])
 @cross_origin(origin=site_url,headers=['Content-Type','Authorization'])
-def update_student_vows(student_id):
+def update_student(student_id):
     users = mongo.db.users
     new_name = request.get_json(force=True)['name']
     new_email = request.get_json(force=True)['email']
@@ -444,6 +428,26 @@ def update_student_vows(student_id):
     return jsonify({'result': output}), html_code
 
 
+@app.route('/users/students/vows/<student_id>', methods=['POST'])
+@cross_origin(origin=site_url,headers=['Content-Type','Authorization'])
+def update_student_vows(student_id):
+    users = mongo.db.users
+    new_vows = request.get_json(force=True)['vows']
+    student = users.find_one({"token":student_id})
+    student_updated = users.update_one({"token":student_id}, {"$set" : {"vows":new_vows}})
+    if student_updated:
+        output = {}
+        output["id"] = student_id
+        html_code = 200
+        msg = Message("Voeux enreistrés",
+                  sender="no-reply@questionnaire-DLC.com",
+                  recipients=[student.mail])
+    else:
+        output = "Could not add student's vows"
+        html_code = 400
+    return jsonify({'result': output}), html_code
+
+
 @app.route('/login/<token>')
 @cross_origin(origin=site_url,headers=['Content-Type','Authorization'])
 def login_service(token):
@@ -451,7 +455,6 @@ def login_service(token):
     student = users.find_one({"token" : token})
     if student:
         output = student["id"]
-        session['token']=token
         html_code = 200
         return get_student_by_id(output)
     else:

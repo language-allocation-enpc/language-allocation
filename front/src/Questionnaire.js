@@ -5,8 +5,6 @@ import url from "./url";
 import vowGenerator from "./VowGenerator";
 import error_panel from './images/error_panel.png';
 import './Questionnaire.css';
-import queryString from 'query-string'
-import Cookies from 'js-cookie';
 
 class Questionnaire extends Component {
     constructor(props) {
@@ -15,10 +13,6 @@ class Questionnaire extends Component {
 
       }
 
-    getUser(key){
-      let res = Cookies.get('user_'+key);
-      return res
-    }
 
     componentDidMount(){
       let new_state=this.state;
@@ -32,7 +26,7 @@ class Questionnaire extends Component {
 
 
 
-      axios.get(url+"courses/")
+      axios.get(url+"courses/", {withCredentials:false})
       .then(
         (result) => {
           let new_state=this.state;
@@ -48,7 +42,7 @@ class Questionnaire extends Component {
           });
         }
       );
-      axios.get(url+"creneaux/")
+      axios.get(url+"creneaux/", {withCredentials:false})
       .then(
         (result) => {
           let new_state=this.state;
@@ -113,7 +107,7 @@ class Questionnaire extends Component {
       let new_state=this.state;
       new_state.data.user_vows=user_vows;
       this.setState(new_state);
-      console.log(user_vows)
+      axios.post(url+'users/students/vows'+window.sessionStorage.getItem("token"),{"vows":user_vows})
       this.setState({answers_are_sent: true})
     }
 
@@ -136,7 +130,7 @@ class Questionnaire extends Component {
           setAnswers={this.setAnswers}
           />;
         }else if(current_step_name==="ranking_english_courses"){
-          let list_english_courses=data.courses.filter(function(value, index, arr){return value.language==="Anglais";});
+          let list_english_courses=this.state.data.courses.filter(function(value, index, arr){return value.language==="Anglais";});
           step=<CourseRankingQuestion
           instructions="Veuillez ordonner les cours d'Anglais par ordre de préférence"
           courses={list_english_courses}

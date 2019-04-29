@@ -1,19 +1,26 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 import './index.css';
 import * as serviceWorker from './serviceWorker';
 import App from './App'
 import Login from './LoginPage'
 import Admin from './Admin'
+import AdminLogin from './AdminLogin'
+import CourseEditing from './CourseEditing'
+import Page404 from './404.js'
 import Questionnaire from "./Questionnaire";
+
 const routing = (
   <Router>
-    <div>
-      <Route path="/form" component={Questionnaire} />
-      <Route path="/login" component={Login} />
-      <Route path="/admin" component={Admin} />
-    </div>
+    <Switch>
+      <Route exact path="/form" component={Questionnaire} />
+      <Route exact path="/login" component={Login} />
+      <Route exact path="/admin" component={Admin} />
+      <Route exact path="/admin/login" component={AdminLogin} />
+      <Route exact path="/admin/manage-courses" component={CourseEditing} />
+      <Route component={Page404} />
+    </Switch>
   </Router>
 )
 ReactDOM.render(routing, document.getElementById('root'));

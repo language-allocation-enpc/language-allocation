@@ -1,94 +1,70 @@
 import React, {Component} from 'react';
+import { Redirect } from 'react-router-dom'
 import axios from 'axios';
 import url from "./url";
 
-export const login = user => {
-  return axios.post(url+'admin/login', {
-      email: user.email,
-      password: user.password
-    })
-    .then(response => {
-      localStorage.setItem('usertoken', response.data)
-      return response.data
-    })
-    .catch(err => {
-      console.log(err)
-    })
-}
-
+axios.defaults.withCredentials = true
 class AdminPage extends Component {
-  constructor() {
-    super()
-    this.state = {
-      email: '',
-      password: '',
-      errors: {}
+  constructor(props) {
+      super(props);
+      this.state = {token:window.sessionStorage.getItem("jwt_token"), isAuth:false};
+
     }
 
-    this.onChange = this.onChange.bind(this)
-    this.onSubmit = this.onSubmit.bind(this)
-  }
 
-  onChange(e) {
-    this.setState({ [e.target.name]: e.target.value })
-  }
-  onSubmit(e) {
-    e.preventDefault()
-
-    const user = {
-      email: this.state.email,
-      password: this.state.password
-    }
-
-    login(user).then(res => {
-      if (!res.error) {
-        this.props.history.push('/form')
-      }else{
-        this.props.history.push('/login')
+  componentDidMount(){
+    axios.get(url+'admin/check-auth', {withCredentials:true, headers:{Authorization: 'Bearer '+this.state.token}}).then(
+      (res)=>{
+        this.state.isAuth=true;
+    },
+      (err)=>{
+        console.log("in the error loop")
+        this.state.isAuth=false;
+        this.props.history.push('/admin/login')
       }
-    })
-  }
-
-  render() {
-    return (
-      <div className="container">
-        <div className="row">
-          <div className="col-md-6 mt-5 mx-auto">
-            <form noValidate onSubmit={this.onSubmit}>
-              <h1 className="h3 mb-3 font-weight-normal">Please sign in</h1>
-              <div className="form-group">
-                <label htmlFor="email">Email address<br/></label>
-                <input
-                  type="email"
-                  className="form-control"
-                  name="email"
-                  placeholder="Enter email"
-                  value={this.state.email}
-                  onChange={this.onChange}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="password">Password <br/></label>
-                <input
-                  type="password"
-                  className="form-control"
-                  name="password"
-                  placeholder="Password"
-                  value={this.state.password}
-                  onChange={this.onChange}
-                />
-              </div>
-              <button
-                type="submit"
-                className="btn btn-lg btn-primary btn-block"
-              >
-                Sign in
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
     )
   }
-}
+
+  getAuth=()=>{
+    axios.get(url+'admin/check-auth', {withCredentials:false, Authorization: 'Bearer '+this.state.token}).then(
+      (res)=>{
+        this.state.isAuth=true;
+        return true;
+    },
+      (err)=>{
+        console.log(err);
+        return false;
+      }
+    )
+  }
+
+
+  render() {
+      return (
+        <div className="buttonList" style={{
+          textAlign:'center',
+        position: 'absolute', left: '50%', top: '40%',
+        transform: 'translate(-50%, -50%)'
+    }}><h2>Bienvenue sur le portail de gestion du questionnaire de langues de la DLC<br/><br/></h2>
+        <form>
+        <input type="button" style={{  backgroundColor: "#4CAF50",border: "none",color: "white",padding: "15px 32px",textAlign: "center",textDecoration: "none",display: "inlineBlock",fontSize: "16px"}} value="Gestion des Cours" onClick={()=>window.location.href='/admin/manage-courses'} />
+        </form>
+        <br/>
+        <form>
+        <input type="button" style={{  backgroundColor: "#4CAF50",border: "none",color: "white",padding: "15px 32px",textAlign: "center",textDecoration: "none",display: "inlineBlock",fontSize: "16px"}} value="Gestion des étudiants" onClick={()=>window.location.href='/admin/manage-students'} />
+        </form>
+        <br/>
+        <form>
+        <input type="button" style={{  backgroundColor: "#4CAF50",border: "none",color: "white",padding: "15px 32px",textAlign: "center",textDecoration: "none",display: "inlineBlock",fontSize: "16px"}} value="Résultats" onClick={()=>window.location.href='/admin/get-affect'} />
+        </form>
+        <br/>
+        <form>
+        <input type="button" style={{  backgroundColor: "#BB3C21",border: "none",color: "white",padding: "15px 32px",textAlign: "center",textDecoration: "none",display: "inlineBlock",fontSize: "16px"}} value="Se déconnecter" onClick={()=>window.location.href='/admin/login'} />
+        </form>
+        </div>
+      )
+    }
+
+  }
+
 export default AdminPage;

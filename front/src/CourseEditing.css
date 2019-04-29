@@ -1,0 +1,68 @@
+.course_info{
+    overflow-y: scroll;
+    margin: 1vh 1vw;
+    border: 0.2em solid rgb(0, 0, 0);
+    border-radius: 0.5em;
+    background-color: white;
+    text-align: center;
+    display:grid;
+    grid-template: 10fr 1fr;
+    grid-template-columns: 10fr 1fr;
+}
+
+.champs{
+    display:inline-flex;
+}
+
+.attribut{
+    margin-left: 10px;
+}
+
+
+.name{
+    text-align: center;
+    text-decoration:underline;
+
+}
+
+.caractéristiques{
+    font-weight: bold;
+}
+
+.cours_L{
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    background-repeat: repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    background-image: url(./images/background_image.jpg);
+}
+
+.button{
+    size: fit-content;
+    font-size: large;
+    margin:10px 10px 10px 10px;
+}
+
+.img_button{
+    text-align: center;
+    margin:auto;
+}
+
+.main-container{
+    margin:0;
+    text-align: center;
+
+}
+.adding_page{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform: translate(-50%, -50%)
+}
+.Title{
+    box-sizing: border-box;
+    border: 5px solid black;
+    background:yellow;
+    display: block;
+}

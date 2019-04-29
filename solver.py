@@ -35,7 +35,7 @@ assignment_model = model("assign")
 # Variables
 course_is_open = assignment_model.var('course is open', C)
 course_headcount = assignment_model.var('course headcount', C)
-student_gets_vow = assignment_model.var('student gets wish', SxV)
+student_gets_vow = assignment_model.var('student gets wish', SxV, kind=int)
 
 # Objective function
 assignment_model.min(sum(

@@ -30,7 +30,7 @@
 .question-footer-left{
     display: inline-flex;
     grid-column: 1;
-    
+
     justify-content: start;
 
 }
@@ -38,7 +38,7 @@
 .question-footer-right{
     display: inline-flex;
     grid-column: 2;
-    
+
     justify-content: end;
 
 }

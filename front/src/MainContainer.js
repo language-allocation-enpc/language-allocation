@@ -23,7 +23,10 @@ class MainContainer extends Component {
         page=<LoginPage handlePageChange={this.handlePageChange}/>
       }
     return (
-      <div className="main-container">{page}</div>
+
+      <div className="main-container">
+      {page}
+      </div>
     );
   }
 }
