@@ -101,7 +101,7 @@ function vowIsValid(vow, schedules){
   function mix(result_1, result_2){
     if(result_1.length===0){
         return result_2;
-    } else if(result_2.length){
+    } else if(result_2.length===0){
         return result_1;
     }
     let result=[]
