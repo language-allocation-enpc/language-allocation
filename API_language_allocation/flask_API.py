@@ -62,7 +62,7 @@ def login():
     if response:
         if bcrypt.check_password_hash(response['password'], password):
             access_token = create_access_token(identity = {
-			    'name': response['name'],
+			    'name': response['first_name'],
 				'email': response['email']}
 				)
 
@@ -73,7 +73,8 @@ def login():
         result = jsonify({"error":"No results found"})
     return result
 
-@app.route('/admin/logout', methods=['DELETE'])
+@app.route('/admin/logout', methods=["DELETE"])
+@cross_origin(origin=site_url,headers=['Content-Type','Authorization'], supports_credentials=True)
 @jwt_required
 def logout():
     jti = get_raw_jwt()['jti']
@@ -87,25 +88,27 @@ def logout():
 def check_auth():
     return jsonify({"state":"true"})
 
-# @app.route('/admin/register', methods=['POST'])
-# def register():
-#     users = mongo.db.users
-#     first_name = request.get_json(force=True)['first_name']
-#     last_name = request.get_json(force=True)['last_name']
-#     email = request.get_json(force=True)['email']
-#     password = bcrypt.generate_password_hash(request.get_json(force=True)['password']).decode('utf-8')
-#
-#     user_id = users.insert({
-# 	'first_name' : first_name,
-# 	'last_name' : last_name,
-# 	'email' : email,
-# 	'password' : password
-# 	})
-#     new_user = users.find_one({'_id' : user_id})
-#
-#     result = {'email' : new_user['email'] + ' registered'}
-#
-#     return jsonify({'result' : result})
+@app.route('/admin/register', methods=['POST'])
+@cross_origin(origin=site_url, headers=['Content-Type','Authorization'], supports_credentials=True)
+def register():
+    users = mongo.db.users
+    first_name = request.get_json(force=True)['first_name']
+    last_name = request.get_json(force=True)['last_name']
+    email = request.get_json(force=True)['email']
+    password = bcrypt.generate_password_hash(request.get_json(force=True)['password']).decode('utf-8')
+
+    user_id = users.insert({
+	'first_name' : first_name,
+	'last_name' : last_name,
+	'email' : email,
+	'password' : password,
+    'type' : "admin"
+	})
+    new_user = users.find_one({'_id' : user_id})
+
+    result = {'email' : new_user['email'] + ' registered'}
+
+    return jsonify({'result' : result})
 
 
 
