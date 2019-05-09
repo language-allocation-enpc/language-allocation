@@ -14,12 +14,11 @@ class LoginPage extends Component {
       }
     componentDidMount() {
         const token = queryString.parse(this.props.location.search).token;
-        console.log(token)
         axios.get(url+"login/"+token,{withCredentials:false})
         .then(
           (result) => {
             let new_state=this.state;
-            window.sessionStorage.setItem("token", token);
+            window.sessionStorage.setItem("token", result.data.result.token);
             window.sessionStorage.setItem("name", result.data.result.name)
             window.sessionStorage.setItem("email", result.data.result.email)
             window.sessionStorage.setItem("vows", result.data.result.vows)

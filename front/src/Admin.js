@@ -7,7 +7,7 @@ axios.defaults.withCredentials = true
 class AdminPage extends Component {
   constructor(props) {
       super(props);
-      this.state = {token:window.sessionStorage.getItem("jwt_token"), isAuth:false};
+      this.state = {token:window.sessionStorage.getItem("jwt_token"), isAuth:null};
 
     }
 
@@ -15,11 +15,12 @@ class AdminPage extends Component {
   componentDidMount(){
     axios.get(url+'admin/check-auth', {withCredentials:true, headers:{Authorization: 'Bearer '+this.state.token}}).then(
       (res)=>{
-        this.state.isAuth=true;
+        this.setState({isAuth:true});
+        console.log("Successfully authentified")
     },
       (err)=>{
         console.log("in the error loop")
-        this.state.isAuth=false;
+        this.setState({isAuth:false});
         this.props.history.push('/admin/login')
       }
     )
@@ -33,14 +34,30 @@ class AdminPage extends Component {
     },
       (err)=>{
         console.log(err);
+        this.state.isAuth=false;
         return false;
+      }
+    )
+  }
+
+  logout=()=>{
+    axios.delete(url+'admin/logout', {withCredentials:false, Authorization: 'Bearer '+this.state.token}).then(
+      (res)=>{
+        this.state.isAuth=false;
+        this.props.history.push('/admin/login');
+    },
+      (err)=>{
+        console.log(err);
+        this.state.isAuth=false;
+        this.props.history.push('/admin/login');
       }
     )
   }
 
 
   render() {
-      return (
+      if (this.state.isAuth){
+        return (
         <div className="buttonList" style={{
           textAlign:'center',
         position: 'absolute', left: '50%', top: '40%',
@@ -64,7 +81,11 @@ class AdminPage extends Component {
         </div>
       )
     }
+    else{
+      return(<div>En cours d'authentification</div>)
+    }
 
   }
+}
 
 export default AdminPage;
