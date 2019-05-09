@@ -31,53 +31,38 @@
 
 .cours_L{
     display:grid;
-    grid-template-columns: 1fr 1fr 1fr
+    grid-template-columns: 1fr 1fr 1fr;
+    background-repeat: repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    background-image: url(./images/background_image.jpg);
 }
 
-.Button{
+.button{
     size: fit-content;
     font-size: large;
+    margin:10px 10px 10px 10px;
 }
 
 .img_button{
     text-align: center;
-    margin: auto;
+    margin:auto;
 }
 
 .main-container{
-    min-height:930px;
-    text-align:center;
-    width:auto;
+    margin:0;
+    text-align: center;
 
 }
-
+.adding_page{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform: translate(-50%, -50%)
+}
 .Title{
     box-sizing: border-box;
-    border: 3px solid black;
-    background:rgb(0, 255, 136);
+    border: 5px solid black;
+    background:yellow;
     display: block;
-}
-
-.texte{
-    color:white;
-    text-shadow: #000000 1px 1px, #000000 -1px 1px, #000000 -1px -1px, #000000 1px -1px;
-    font-size:xx-large;
-    font-weight: bold;
-}
-
-.course-list-filter-option{
-    text-align: center;
-}
-
-.cat{
-    color:white;
-    font-size:x-large;
-    text-shadow: #000000 1px 1px 2px, #000000 -1px 1px 2px, #000000 -1px -1px 2px, #000000 1px -1px 2px;
-}
-
-.nom_cours{
-    color:white;
-    font-size:xx-large;
-    text-shadow: #000000 1px 1px 5px, #000000 -1px 1px 5px, #000000 -1px -1px 5px, #000000 1px -1px 5px;
-
 }

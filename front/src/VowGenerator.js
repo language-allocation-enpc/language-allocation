@@ -101,7 +101,7 @@ function vowIsValid(vow, schedules){
   function mix(result_1, result_2){
     if(result_1.length===0){
         return result_2;
-    } else if(result_2.length){
+    } else if(result_2.length===0){
         return result_1;
     }
     let result=[]
@@ -151,11 +151,26 @@ function vowIsValid(vow, schedules){
       return result
   }
 
-  function vowGenerator(number_english_courses, number_other_courses, ranking_english_courses, ranking_other_courses, schedules){
-    let raw_vow_list=mix(generate_combinations(ranking_english_courses, number_english_courses), generate_combinations(ranking_other_courses, number_other_courses))
+  function vowGenerator(number_english_courses, number_other_courses, ranking_english_courses, ranking_other_courses, schedules, empty_course){
+    let enough_vows=true;
+    let copy_ranking_english_courses=ranking_english_courses.slice();
+    let copy_ranking_other_courses=ranking_other_courses.slice();
+    copy_ranking_english_courses.push(empty_course);
+    copy_ranking_other_courses.push(empty_course);
+    let raw_vow_list=mix(generate_combinations(copy_ranking_english_courses, number_english_courses), generate_combinations(copy_ranking_other_courses, number_other_courses))
     let checked_vow_list=raw_vow_list.filter(vow=>{return vowIsValid(vow, schedules)})
     checked_vow_list.sort((vow1, vow2)=>{return vow1.weight-vow2.weight});
-    return checked_vow_list.slice(0, Math.min(NUMBER_VOWS, checked_vow_list.length));
+    let empty_vow={list: [], weight: checked_vow_list[checked_vow_list.length-1].weight+100} //empty vow is more expensive than the last vow
+    if(checked_vow_list.length<NUMBER_VOWS){// when there are not enough vows, the list is filled with empty vows 
+      enough_vows=false;
+      for(let i=0;i<NUMBER_VOWS-checked_vow_list.length; i++){
+        checked_vow_list.push(empty_vow);
+      }
+    } else { // in any case the last vow is set to empty vow to garantee a solution
+      checked_vow_list= checked_vow_list.slice(0, NUMBER_VOWS-1);
+      checked_vow_list.push(empty_vow);
+    }
+    return { vow_list: checked_vow_list, enough_vows: enough_vows}
   }
   
   /*const vows = parse('data_example.json')

@@ -9,7 +9,7 @@ import './Questionnaire.css';
 class Questionnaire extends Component {
     constructor(props) {
         super(props);
-        this.state = { data: {courses: dummyData, schedules: [], user_id: null, user_name: null, user_vows: null}, is_loaded: false, step_list: ["initial_questions"], step_index: 0, answers_are_sent: false, answers: { year: '', TOEIC: '', justification_no_english: '', justification_no_english_text: '', number_english_courses: 1, number_other_courses: 0, english_courses_ranking:[], other_courses_ranking:[]}};
+        this.state = { data: {courses: dummyData, empty_course: null, schedules: [], user_id: null, user_name: null, user_vows: null, enough_vows: false, token: null}, is_loaded: false, step_list: ["initial_questions"], step_index: 0, answers_are_sent: false, answers: { year: '', TOEIC: '', justification_no_english: '', justification_no_english_text: '', number_english_courses: 1, number_other_courses: 0, english_courses_ranking:[], other_courses_ranking:[]}};
 
       }
 
@@ -19,10 +19,12 @@ class Questionnaire extends Component {
       new_state.data.user_name=window.sessionStorage.getItem("name");
       new_state.data.user_email = window.sessionStorage.getItem("email");
       new_state.data.vows=window.sessionStorage.getItem("vows");
-      new_state.is_loaded=true
+      new_state.data.token=window.sessionStorage.getItem("token");
+      new_state.is_loaded=true;
       this.setState({
         new_state
       });
+      console.log(new_state)
 
 
 
@@ -30,8 +32,9 @@ class Questionnaire extends Component {
       .then(
         (result) => {
           let new_state=this.state;
-          new_state.data.courses=result.data.result
-          new_state.is_loaded=true
+          new_state.data.courses=result.data.result.slice(1);//the empty course should be the first of the list
+          new_state.data.empty_course=result.data.result[0];
+          new_state.is_loaded=true;
           this.setState({
             new_state
           });
@@ -46,8 +49,8 @@ class Questionnaire extends Component {
       .then(
         (result) => {
           let new_state=this.state;
-          new_state.data.schedules=result.data.result
-          new_state.is_loaded=true
+          new_state.data.schedules=result.data.result;
+          new_state.is_loaded=true;
           this.setState({
             new_state
           });
@@ -133,14 +136,17 @@ class Questionnaire extends Component {
 
     updateVows=()=>{
       let answers=this.state.answers;
-      let user_vows=vowGenerator(answers.number_english_courses, answers.number_other_courses, answers.english_courses_ranking, answers.other_courses_ranking, this.state.data.schedules);
+      let vow_generation=vowGenerator(answers.number_english_courses, answers.number_other_courses, answers.english_courses_ranking, answers.other_courses_ranking, this.state.data.schedules, this.state.data.empty_course);
+      let user_vows=vow_generation.vow_list;
+      let enough_vows=vow_generation.enough_vows;
       let new_state=this.state;
       new_state.data.user_vows=user_vows;
+      new_state.data.enough_vows=enough_vows;
       this.setState(new_state);
     }
 
     enoughVows=()=>{
-      return this.state.data.user_vows.length>5; //!!!!!!!!!!!!!!!!!!!!!à modifier
+      return this.state.data.enough_vows; //!!!!!!!!!!!!!!!!!!!!!à modifier
     }
 
     getAnswersAreSent=()=>{
@@ -149,7 +155,16 @@ class Questionnaire extends Component {
 
     sendAnswers=()=>{
       console.log(this.state.data.user_vows)
-      this.setState({answers_are_sent: true})
+      let object_to_send={vows: this.state.data.user_vows};
+      axios.post(url+"users/students/vows/"+this.state.data.token,object_to_send)
+      .then(
+        (result) => {
+          this.setState({answers_are_sent: true})
+        },
+        (error) => {
+          this.setState({answers_are_sent: false})
+        }
+      );
     }
 
     getSchedules = ()=>{
@@ -377,7 +392,7 @@ class CourseRankingInstructions extends Component {
               <p>Ce classement sera soumis à un programme d'optimisation qui a pour but d'attibuer à chacun des cours en maximisant la satisfaction globale, ce n'est PAS UN SHOTGUN.</p>
               <p>Vous n'êtes pas tenus de classer tous les cours et seuls les cours que vous avez classés pourront vous être attribués.</p>
               <WarningMessage text={"Cependant ATTENTION ! Veillez à classer suffisamment de cours pour être certain(e) d'en avoir en cas de forte demande de vos premiers choix."}/>
-              <p>Si vous avez classé trop peu de cours et que le programme n'arrive pas à vous en attribuer autant que vous en avez demandé parmi ceux classés, vous aurez moins de cours que ce que vous souhaitiez, voire aucun. </p>
+              <WarningMessage text="Si vous avez classé trop peu de cours et que le programme n'arrive pas à vous en attribuer assez parmi ceux classés, vous aurez moins de cours que ce que vous souhaitiez, VOIRE AUCUN !"/>
               <p>Il est donc dans votre intérêt de classer un maximum de cours dans les langues que vous voulez étudier, sous peine de ne pas valider suffisamment d'ECTS.</p>
               {this.props.getAnswers().number_english_courses>0 ?
               <p></p>
@@ -398,7 +413,7 @@ class CourseRankingInstructions extends Component {
         </div>
       );
     }
-}
+} 
 
 class CourseRankingQuestion extends Component {
     constructor(props) {
@@ -511,13 +526,13 @@ class FinalQuestion extends Component {
             <QuestionInstructions text={this.props.instructions}/>
             <div className="question-content">
               <div className="final-question-container">
-
+              
               {this.props.getAnswersAreSent() ? <div className="final-buttons-box">Vos réponses ont bien été envoyées.</div> :
-                  [enough_vows ? null :
-                    [<WarningMessage text="ATTENTION ! Vous avez classé trop peu de cours ou peu de cours compatibles entre eux. Nous vous invitons à en classer davantage avant d'envoyer vos réponses."/>,
-                  <WarningMessage text="N'ignorez ce message que si vous êtes absolument certain(e) d'avoir des places dans les cours que vous avez classés."/> ],
-
-                  <div className="final-buttons-box">
+                  [enough_vows ? null : 
+                    [<WarningMessage key= "warning-message1" text="ATTENTION ! Vous avez classé trop peu de cours ou peu de cours compatibles entre eux. Nous vous invitons à en classer davantage avant d'envoyer vos réponses."/>,
+                  <WarningMessage key= "warning-message2" text="N'ignorez ce message que si vous êtes absolument certain(e) d'avoir des places dans les cours que vous avez classés."/> ],
+                   
+                  <div className="final-buttons-box" key="final-button-box">
                   <FinalButton text={"Envoyer les réponses"} onClick={this.props.sendAnswers}/>
                   <FinalButton text={"Annuler le questionnaire"}/>
                   </div> ]
