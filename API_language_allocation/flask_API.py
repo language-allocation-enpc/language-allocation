@@ -32,13 +32,22 @@ login_manager.login_view = 'login'
 app.config['MONGO_DBNAME'] = 'language_allocation_database'
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/language_allocation_database'
 app.config['SECRET_KEY'] = '6Cb4CTv46t39GYncwkmTEbcjs9415fskfnR'
+app.config['JWT_BLACKLIST_ENABLED'] = True
+app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['JWT_SECRET_KEY'] = 'WkDHlzbF3d6kWOGQcZvKudFjsJNeSOFY'
 mongo = PyMongo(app)
-
+blacklist = set()
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 mail = Mail(app)
+
+
+@jwt.token_in_blacklist_loader
+def check_if_token_in_blacklist(decrypted_token):
+    jti = decrypted_token['jti']
+    return jti in blacklist
+
 
 @app.route('/admin/login', methods=['POST'])
 @cross_origin(origin=site_url, headers=['Content-Type','Authorization'], supports_credentials=True)
@@ -63,6 +72,14 @@ def login():
     else:
         result = jsonify({"error":"No results found"})
     return result
+
+@app.route('/admin/logout', methods=['DELETE'])
+@jwt_required
+def logout():
+    jti = get_raw_jwt()['jti']
+    blacklist.add(jti)
+    return jsonify({"msg": "Successfully logged out"}), 200
+
 
 @app.route('/admin/check-auth', methods=['GET'])
 @cross_origin(origin=site_url,headers=['Content-Type','Authorization'], supports_credentials=True)
@@ -428,16 +445,16 @@ def update_student(student_id):
     return jsonify({'result': output}), html_code
 
 
-@app.route('/users/students/vows/<student_id>', methods=['POST'])
+@app.route('/users/students/vows/<student_token>', methods=['POST'])
 @cross_origin(origin=site_url,headers=['Content-Type','Authorization'])
-def update_student_vows(student_id):
+def update_student_vows(student_token):
     users = mongo.db.users
     new_vows = request.get_json(force=True)['vows']
-    student = users.find_one({"token":student_id})
-    student_updated = users.update_one({"token":student_id}, {"$set" : {"vows":new_vows}})
+    student = users.find_one({"token":student_token})
+    student_updated = users.update_one({"token":student_token}, {"$set" : {"vows":new_vows}})
     if student_updated:
         output = {}
-        output["id"] = student_id
+        output["token"] = student_token
         html_code = 200
         msg = Message("Voeux enreistrés",
                   sender="no-reply@questionnaire-DLC.com",
