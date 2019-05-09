@@ -42,6 +42,7 @@ def write_course(id=-1, name='', language='', creneaux =[], min_students=0, max_
     course["max_students"] = max_students
     app_db.courses.insert_one(course)
 
+write_course(0, "Cours vide", "", [0], 0, 10000) #Le premier cours est le cours "vide"
 write_course(1,"Public Speaking", "Anglais", [1], 5, 15)
 write_course(2,"Talk Like TED", "Anglais", [1], 5, 15)
 write_course(3,"Conversational English", "Anglais", [1], 5, 15)
