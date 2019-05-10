@@ -160,7 +160,7 @@ function vowIsValid(vow, schedules){
     let raw_vow_list=mix(generate_combinations(copy_ranking_english_courses, number_english_courses), generate_combinations(copy_ranking_other_courses, number_other_courses))
     let checked_vow_list=raw_vow_list.filter(vow=>{return vowIsValid(vow, schedules)})
     checked_vow_list.sort((vow1, vow2)=>{return vow1.weight-vow2.weight});
-    let empty_vow={list: [], weight: checked_vow_list[checked_vow_list.length-1].weight+100} //empty vow is more expensive than the last vow
+    let empty_vow={list: [], weight: checked_vow_list[checked_vow_list.length-1]? (checked_vow_list[checked_vow_list.length-1].weight+100):0} //empty vow is more expensive than the last vow
     if(checked_vow_list.length<NUMBER_VOWS){// when there are not enough vows, the list is filled with empty vows 
       enough_vows=false;
       for(let i=0;i<NUMBER_VOWS-checked_vow_list.length; i++){

@@ -132,6 +132,7 @@ class Questionnaire extends Component {
     setAnswers=(new_answers)=>{
       let new_step_list=this.buildStepList(new_answers);
       this.setState({answers: new_answers, step_list: new_step_list});
+
     }
 
     updateVows=()=>{
