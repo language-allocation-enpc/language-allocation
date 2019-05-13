@@ -476,8 +476,8 @@ class CourseEditing extends Component {
           type = "text"
           value = {this.state.course.max_students}
           onChange = {this.handleInputChange} /> </p>])
-          let submit_button = <Button text = "submit" onClick={()=>this.submit()}/>;
-          let exit_button = <Button text = "exit" onClick={this.exit}/>;
+          let submit_button = <Button text = "soumettre" onClick={()=>this.submit()}/>;
+          let exit_button = <Button text = "sortir" onClick={this.exit}/>;
           add_course.push([submit_button,exit_button]);
         return(<div className="adding_page">{add_course}</div>)
       }
