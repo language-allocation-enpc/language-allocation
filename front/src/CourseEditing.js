@@ -467,7 +467,7 @@ class CourseEditing extends Component {
           name="ajouter_nom"
           type="text"
           value={this.state.course.name}
-          onChange={this.handleInputChange} /> </p>,<label className = "cat">changer la capacité :</label>,<p><label className ="cat">minimum :</label><input
+          onChange={this.handleInputChange} /> </p>,<label className = "cat">Capacité :</label>,<p><label className ="cat">minimum :</label><input
           name = "ajouter_minimum"
           type = "text"
           value = {this.state.course.min_students}
