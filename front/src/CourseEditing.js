@@ -3,9 +3,9 @@ import './App.css';
 import axios from 'axios';
 import url from "./url";
 import "./CourseEditing.css"
-import plus_button from "./images/plus-button.png"
-import suppr_button from "./images/suppr-button.png"
-import edit_button from "./images/edit-button.png"
+import plus_button from "./images/plus_button.png"
+import suppr_button from "./images/suppr_button.png"
+import edit_button from "./images/edit_button.png"
 import background_wall from "./images/background_image.jpg"
 
 
@@ -25,10 +25,10 @@ class CourseEditing extends Component {
       componentDidMount(){
         axios.get(url+'admin/check-auth', {withCredentials:true, headers:{Authorization: 'Bearer '+this.state.token}}).then(
           (res)=>{
-            this.state.isAuth=true;
+            this.setState({isAuth:true});
         },
           (err)=>{
-            this.state.isAuth=false;
+            this.setState({isAuth:false});
             this.props.history.push('/admin/login')
           }
         )
@@ -49,6 +49,12 @@ class CourseEditing extends Component {
           let new_state=this.state;
           new_state.page=page_name;
           this.setState(new_state);
+          axios.get(url + "courses/", {withCredentials:false})
+          .then(res => {let data_serv= res.data.result;
+            let new_state = this.state;
+            new_state.data=data_serv;
+           this.setState(new_state);
+         this.forceUpdate();})
 
       }
       get_data = ()=> {
@@ -61,11 +67,11 @@ class CourseEditing extends Component {
       }
 
       set_data = (course)=>{
-        axios.post(url + "/courses/" + course.id ,{name:course.name,language:course.language,creneaux:course.creneaux,min_students:course.min_students,max_students:course.max_students});
+        axios.post(url + "courses/" + course.id ,{name:course.name,language:course.language,creneaux:course.creneaux,min_students:course.min_students,max_students:course.max_students});
       }
 
       add_data = (course)=>{
-        axios.put(url + "/courses/", {name:course.name,language:course.language,creneaux:course.creneaux,min_students:course.min_students,max_students:course.max_students});
+        axios.put(url + "courses/", {name:course.name,language:course.language,creneaux:course.creneaux,min_students:course.min_students,max_students:course.max_students});
       }
 
       get_id = ()=>{
@@ -73,7 +79,13 @@ class CourseEditing extends Component {
       }
 
       delete_course = index =>{
-        axios.delete(url + "/courses/" + index);
+        axios.delete(url + "courses/" + index);
+        axios.get(url + "courses/", {withCredentials:false})
+        .then(res => {let data_serv= res.data.result;
+          let new_state = this.state;
+          new_state.data=data_serv;
+         this.setState(new_state);})
+         this.props.history.push('/admin/manage-courses')
 
       }
 
@@ -150,9 +162,7 @@ class CourseEditing extends Component {
         let L_creneaux = this.props.get_creneaux();
         let list_languages=[];
         let list_schedules=[];
-        console.log(newdata)
         for(let index=0; index<newdata.length; index++){
-          console.log("test")
           let current_course=newdata[index];
           if(!list_languages.includes(current_course.language)){list_languages.push(current_course.language)};
           for(let index_schedule=0; index_schedule<L_creneaux.length; index_schedule++){
@@ -200,14 +210,13 @@ class CourseEditing extends Component {
                 <div className="attribut">{L_creneaux[id].begin} / {L_creneaux[id].end}</div></div></p>})}
               </div>)
               let change_button=<img width = "50%" height = "15%" src = {edit_button} alt='' onClick={()=>this.props.edit_course(index)}/>
-              course_info.push(<div className = "up-right_button">{quit_button}{change_button}</div>)
+              course_info.push(<div className = "up-right_button">{quit_button}   {change_button}</div>)
             cours_L.push(<div className="course_info">{course_info}</div>)
             }
         return (
-          <div className="cours_L">
-          <CourseListFilter criteriaWithOptions={this.state.criteria_with_options} getCurrentFilters={this.getCurrentFilters}
+          <div><CourseListFilter className = "selection" criteriaWithOptions={this.state.criteria_with_options} getCurrentFilters={this.getCurrentFilters}
           handleFilterChange={this.handleFilterChange} getSchedules={this.props.get_creneaux}/>
-          {cours_L}</div>
+          <div className="cours_L">{cours_L}</div></div>
         );
       }
     }
@@ -229,7 +238,7 @@ class CourseEditing extends Component {
           }
           criteria_selection.push(
             <div className="course-list-filter-option" key={criterion}>
-            <label >{criterion==="language"?"Langue : ":(criterion==="schedule"?"Horaire : ":"erreur")}</label>
+            <label >{criterion==="language"?<div className="texte">Langue : </div>:(criterion==="schedule"?<div className="texte">Horaire : </div>:"erreur")}</label>
             <select
                 name={criterion}
                 type='select'
@@ -317,7 +326,7 @@ class CourseEditing extends Component {
           creneaux_op.push({ value:cren,label:L_creneaux[cren].day + " " + L_creneaux[cren].begin + " / " + L_creneaux[cren].end});
         }
         creneaux_op[0].label = "hors creneaux";
-        change_course.push([<h1 className="Title">Modifier le cours</h1> ,<h2>{this.state.data[id].name}</h2>,<label>Créneaux : </label>,
+        change_course.push([<h1 className="Title">Modifier le cours {this.state.data[id].name}</h1>,<label className = "cat">Horaires : </label>,
         <div>{this.state.data[id].creneaux.map((cren)=>{
           return <select
           name="changer_horaires"
@@ -331,21 +340,21 @@ class CourseEditing extends Component {
               })
             }
              </select>
-           })} </div>,<p><label>Modifier le nom : </label><input
+           })} </div>,,<p><label className = "cat">Nom : </label><input
           name="changer_nom"
           type="text"
           value={this.state.data[id].name}
-          onChange={this.handleInputChange} /> </p>,<p><label>Modifier la capacité : Minimum :</label><input
+          onChange={this.handleInputChange} /> </p>,<label className = "cat">Changer la capacité : <br/></label>,<p><label className ="cat">Minimum : </label><input
           name = "changer_minimum"
           type = "text"
           value = {this.state.data[id].min_students}
-          onChange = {this.handleInputChange} /><label> Maximum : </label><input
+          onChange = {this.handleInputChange} /><label className = "cat">   Maximum : </label><input
           name = "changer_maximum"
           type = "text"
           value = {this.state.data[id].max_students}
           onChange = {this.handleInputChange} /> </p>])
           let submit_button = <Button text = "Soumettre" onClick={this.submit}/>;
-          let exit_button = <Button text = "Retour" onClick={this.exit}/>;
+          let exit_button = <Button text = "Sortir" onClick={this.exit}/>;
           change_course.push([submit_button,exit_button]);
         return(<div className="changing_page">{change_course}</div>)
       }
@@ -434,7 +443,7 @@ class CourseEditing extends Component {
           creneaux_op.push({ value:cren,label:L_creneaux[cren].day + " " + L_creneaux[cren].begin + " / " + L_creneaux[cren].end});
         }
         creneaux_op[0].label = "hors creneaux";
-        add_course.push([<h1>Ajouter un cours</h1> ,<label>Nombre de créneaux : </label>,<select
+        add_course.push([<h1 className="Title">Ajouter cours</h1> ,<label className = "cat">nombre de créneaux</label>,<select
           name="nombre_créneaux"
           type="select"
           value={this.state.course.creneaux.length}
@@ -442,7 +451,7 @@ class CourseEditing extends Component {
           <option value={1}>1</option>
           <option value={2}>2</option></select>
           ,<div>{this.state.course.creneaux.map((cren)=>{
-            return <span><br/><label>Créneau(x) : </label><select
+            return <select
             name="ajouter_horaires"
             type='select'
             value={cren}
@@ -453,22 +462,22 @@ class CourseEditing extends Component {
                   return <option value ={creneaux.value} id = {this.state.course.creneaux.indexOf(cren)}>{creneaux.label} </option>;
                 })
               }
-               </select><br/><br/></span>
-             })} </div>,<p><label>Nom du cours : </label><input
+               </select>
+              })} </div>,<p><label className = "cat">nom : </label><input
           name="ajouter_nom"
           type="text"
           value={this.state.course.name}
-          onChange={this.handleInputChange} /> </p>,<p><label>Capacité : Minimum :</label><input
+          onChange={this.handleInputChange} /> </p>,<label className = "cat">changer la capacité :</label>,<p><label className ="cat">minimum :</label><input
           name = "ajouter_minimum"
           type = "text"
           value = {this.state.course.min_students}
-          onChange = {this.handleInputChange} /><label> Maximum : </label><input
+          onChange = {this.handleInputChange} /><label className = "cat"> maximum : </label><input
           name = "ajouter_maximum"
           type = "text"
           value = {this.state.course.max_students}
           onChange = {this.handleInputChange} /> </p>])
-          let submit_button = <Button text = "Soumettre" onClick={()=>this.submit()}/>;
-          let exit_button = <Button text = "Retour" onClick={this.exit}/>;
+          let submit_button = <Button text = "submit" onClick={()=>this.submit()}/>;
+          let exit_button = <Button text = "exit" onClick={this.exit}/>;
           add_course.push([submit_button,exit_button]);
         return(<div className="adding_page">{add_course}</div>)
       }
@@ -482,5 +491,4 @@ class CourseEditing extends Component {
       }
     }
 
-
-export default CourseEditing;
+    export default CourseEditing;

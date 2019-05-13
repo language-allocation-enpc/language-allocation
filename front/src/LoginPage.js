@@ -14,7 +14,6 @@ class LoginPage extends Component {
       }
     componentDidMount() {
         const token = queryString.parse(this.props.location.search).token;
-        console.log(token)
         axios.get(url+"login/"+token,{withCredentials:false})
         .then(
           (result) => {

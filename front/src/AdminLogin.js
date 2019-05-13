@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import axios from 'axios';
 import url from "./url";
-
+import "./Admin.css"
+import error_panel from './images/error_panel.png';
 
 
 
@@ -12,7 +13,7 @@ class AdminPage extends Component {
       email: '',
       password: '',
       isAuth:false,
-      errors: {}
+      error: null
     }
 
     this.onChange = this.onChange.bind(this)
@@ -32,7 +33,7 @@ class AdminPage extends Component {
             return response.data.token
         }
         else{
-          console.log("Bad Identification : "+response.data.error);
+          this.setState({error: "Bad Identification : "+response.data.error});
         }
       })
       .catch(err => {
@@ -62,62 +63,135 @@ class AdminPage extends Component {
 
 
   render() {
-    return (
-      <div className="LoginPage">
-      <span style={{backgound:"#0000FF", textAlign:"center",margin:"0 0 20 20", textColor:"#000000"}}>
-      <div className="head_banner">
-      Admin DLC
-      </div>
-      </span>
+    if (this.state.error){
+      return (
+        <div className="main">
+        <div className="LoginPage">
+        <span style={{backgound:"#0000FF", textAlign:"center",margin:"0 0 20 20", textColor:"#000000"}}>
+        <div className="head_banner">
+        Admin DLC
+        </div>
+        </span>
 
 
-      <span style={{
-        textAlign:'center',
-      position: 'absolute', left: '50%', top: '40%',
-      transform: 'translate(-50%, -50%)'
-  }}>
-      <div className="container">
-        <div className="row">
-          <div className="col-md-6 mt-5 mx-auto">
-            <form noValidate onSubmit={this.onSubmit}>
-              <h1 className="h3 mb-3 font-weight-normal">Connectez-vous</h1>
-              <div className="form-group">
-                <label htmlFor="email">Adresse mail <br/></label>
-                <input
-                  type="email"
-                  className="form-control"
-                  name="email"
-                  placeholder="Email"
-                  value={this.state.email}
-                  onChange={this.onChange}
-                />
-              </div><br/>
-              <div className="form-group">
-                <label htmlFor="password">Mot de passe <br/></label>
-                <input
-                  type="password"
-                  className="form-control"
-                  name="password"
-                  placeholder="Mot de passe"
-                  value={this.state.password}
-                  onChange={this.onChange}
-                />
+        <span style={{
+          textAlign:'center',
+        position: 'absolute', left: '50%', top: '40%',
+        transform: 'translate(-50%, -50%)'
+    }}>
+        <div className="container">
+          <div className="row">
+            <div className="col-md-6 mt-5 mx-auto">
+              <form noValidate onSubmit={this.onSubmit}>
+                <h1 className="h3 mb-3 font-weight-normal">Connectez-vous</h1>
+                <div className="form-group">
+                  <label htmlFor="email">Adresse mail <br/></label>
+                  <input
+                    type="email"
+                    className="form-control"
+                    name="email"
+                    placeholder="Email"
+                    value={this.state.email}
+                    onChange={this.onChange}
+                  />
+                </div><br/>
+                <div className="form-group">
+                  <label htmlFor="password">Mot de passe <br/></label>
+                  <input
+                    type="password"
+                    className="form-control"
+                    name="password"
+                    placeholder="Mot de passe"
+                    value={this.state.password}
+                    onChange={this.onChange}
+                  />
 
-              </div>
-              <br/>
-              <button
-                type="submit"
-                className="btn btn-lg btn-primary btn-block"
-              >
-                Se connecter
-              </button>
-            </form>
+                </div>
+                <br/>
+                <button
+                  type="submit"
+                  className="btn btn-lg btn-primary btn-block"
+                >
+                  Se connecter
+                </button>
+              </form>
+              <br/><br/>
+
+              <ErrorMessage text="Mauvais identifiant / email"/>
+            </div>
           </div>
         </div>
-      </div>
-      </span>
-      </div>
-    )
+        </span>
+        </div>
+        </div>
+      )
+    }else{
+      return (
+        <div className="LoginPage">
+        <span style={{backgound:"#0000FF", textAlign:"center",margin:"0 0 20 20", textColor:"#000000",zIndex:'0'}}>
+        <div className="head_banner">
+        Admin DLC
+        </div>
+        </span>
+
+
+        <span style={{
+          textAlign:'center',
+        position: 'absolute', left: '50%', top: '40%',
+        transform: 'translate(-50%, -50%)'
+    }}>
+        <div className="container">
+          <div className="row">
+            <div className="col-md-6 mt-5 mx-auto">
+              <form noValidate onSubmit={this.onSubmit}>
+                <h1 className="h3 mb-3 font-weight-normal">Connectez-vous</h1>
+                <div className="form-group">
+                  <label htmlFor="email">Adresse mail <br/></label>
+                  <input
+                    type="email"
+                    className="form-control"
+                    name="email"
+                    placeholder="Email"
+                    value={this.state.email}
+                    onChange={this.onChange}
+                  />
+                </div><br/>
+                <div className="form-group">
+                  <label htmlFor="password">Mot de passe <br/></label>
+                  <input
+                    type="password"
+                    className="form-control"
+                    name="password"
+                    placeholder="Mot de passe"
+                    value={this.state.password}
+                    onChange={this.onChange}
+                  />
+
+                </div>
+                <br/>
+                <button
+                  type="submit"
+                  className="btn btn-lg btn-primary btn-block"
+                >
+                  Se connecter
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+        </span>
+        </div>
+      )
+    }
+
+  }
+}
+
+class ErrorMessage extends Component {
+  render() {
+    return (
+      <div className="error-message" ><img src={error_panel} alt="error_panel" style={{height: "5vh"}}/>{this.props.text}</div>
+    );
   }
 }
 export default AdminPage;
