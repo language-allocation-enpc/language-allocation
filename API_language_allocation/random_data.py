@@ -2,6 +2,7 @@ import names
 import string
 from data_structs import *
 import random as rd
+import numpy as np
 
 LANGUAGES = ['Anglais', 'Espagnol', 'Allemand', 'Russe', 'Italien', 'Arabe', 'Japonais']
 
@@ -25,15 +26,12 @@ def generate_random_course(last_id):
     result.min_students = rd.randint(2,9)
     result.max_students = rd.randint(result.min_students+4, 30)
     result.id = last_id + 1
-    result.name = generate_random_string()
-    result.creneau = [rd.randint(1, 13) for i in range(rd.randint(1,2))]
     return result
 
 
-def generate_random_course_list(nb_courses):
+def generate_random_course_list(result_size):
     id = 0
     result = []
-    result_size =nb_courses
     for i in range(result_size):
         result.append(generate_random_course(id))
         id+=1
@@ -52,6 +50,20 @@ def generate_random_vow(courses, nb_courses_in_vow=3): #generates a vow with nb_
     result.courses=random_distinct_courses
     result.nb_courses=len(random_distinct_courses)
     return result
+
+def generate_random_vow_matrix_and_weight_matrix(num_students, num_vows, courses):
+    vow_matrix=np.zeros((num_students, num_vows, len(courses)))
+    weight_matrix=np.zeros((num_students, num_vows))
+    for student in range(num_students):
+        current_cost=rd.randint(10, 20)
+        for student_vow in range(num_vows):
+            new_vow=generate_random_vow(courses, rd.randint(1, 4))
+            for course_in_vow in range(len(new_vow.courses)):
+                vow_matrix[student, student_vow, new_vow.courses[course_in_vow].id-1]=1
+            weight_matrix[student, student_vow]=current_cost
+            current_cost+=rd.randint(1, 4)
+    return vow_matrix, weight_matrix
+
 
 
 def generate_random_student(courses, nb_vows, nb_courses_in_vow):
