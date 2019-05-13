@@ -17,7 +17,7 @@ from solver import *
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
-from flask_mail import Mail
+from flask_mail import Mail, Message
 site_url = 'http://localhost:3000/'
 
 
@@ -28,7 +28,7 @@ cors = CORS(app, resources={r"/*":{"origins": site_url}})
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
-
+app.testing=False
 app.config['MONGO_DBNAME'] = 'language_allocation_database'
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/language_allocation_database'
 app.config['SECRET_KEY'] = '6Cb4CTv46t39GYncwkmTEbcjs9415fskfnR'
@@ -36,12 +36,20 @@ app.config['JWT_BLACKLIST_ENABLED'] = True
 app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['JWT_SECRET_KEY'] = 'WkDHlzbF3d6kWOGQcZvKudFjsJNeSOFY'
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USERNAME'] = '3071go.nathan@gmail.com'
+app.config['MAIL_PASSWORD'] = 'youhou95'
 mongo = PyMongo(app)
 blacklist = set()
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 mail = Mail(app)
 
+def generate_token():
+    return ''.join(random.choices(string.ascii_uppercase +string.ascii_lowercase+ string.digits, k=35))
 
 @jwt.token_in_blacklist_loader
 def check_if_token_in_blacklist(decrypted_token):
@@ -126,7 +134,7 @@ def get_max_collection_id(collection):
 
 
 @app.route('/courses/', methods=['GET'])
-@cross_origin(origin=site_url,headers=['Content-Type','Authorization'])
+@cross_origin(origin=site_url,headers=['Content-Type','Authorization'], supports_credentials=True)
 def get_all_courses():
     courses = mongo.db.courses
     all_courses = courses.find()
@@ -150,7 +158,7 @@ def get_all_courses():
 
 
 @app.route('/courses/<course_id>', methods=['GET'])
-@cross_origin(origin=site_url,headers=['Content-Type','Authorization'])
+@cross_origin(origin=site_url,headers=['Content-Type','Authorization'], supports_credentials=True)
 def get_course_by_id(course_id):
     courses = mongo.db.courses
     course = courses.find_one({"id": int(course_id)})
@@ -192,7 +200,7 @@ def get_course_by_language(language):
     return jsonify({'result': Output}), html_code
 
 @app.route('/courses/not-english/', methods=['GET'])
-@cross_origin(origin=site_url,headers=['Content-Type','Authorization'])
+@cross_origin(origin=site_url,headers=['Content-Type','Authorization'], supports_credentials=True)
 def get_course_not_english():
     courses = mongo.db.courses
     Output = []
@@ -211,7 +219,7 @@ def get_course_not_english():
 
 
 @app.route('/courses/<course_id>', methods=['POST'])
-@cross_origin(origin=site_url,headers=['Content-Type','Authorization'])
+@cross_origin(origin=site_url,headers=['Content-Type','Authorization'], supports_credentials=True)
 def update_course(course_id):
     courses = mongo.db.courses
     new_name = request.get_json(force=True)['name']
@@ -235,7 +243,7 @@ def update_course(course_id):
 
 
 @app.route('/courses/', methods=['PUT'])
-@cross_origin(origin=site_url,headers=['Content-Type','Authorization'])
+@cross_origin(origin=site_url,headers=['Content-Type','Authorization'], supports_credentials=True)
 def add_course():
     courses = mongo.db.courses
     id = get_max_collection_id(courses)+1
@@ -260,7 +268,7 @@ def add_course():
 
 
 @app.route('/courses/<course_id>', methods=['DELETE'])
-@cross_origin(origin=site_url,headers=['Content-Type','Authorization'])
+@cross_origin(origin=site_url,headers=['Content-Type','Authorization'], supports_credentials=True)
 def remove_course(course_id):
     courses = mongo.db.courses
     course_removed = courses.remove({"id":int(course_id)})
@@ -403,9 +411,102 @@ def get_student_by_id(student_id):
         html_code = 400
     return jsonify({'result': output}), html_code
 
+@app.route('/users/students/', methods=['GET'])
+@cross_origin(origin=site_url,headers=['Content-Type','Authorization'], supports_credentials=True)
+@jwt_required
+def get_all_students():
+    users = mongo.db.users
+    students = users.find({"type": "student"})
+    if students:
+        Output = []
+        for student in students:
+            if student['email']!='':
+                output={}
+                output["id"] = student["id"]
+                output["first_name"] = student["name"].split(' ')[0]
+                output["last_name"] = student["name"].split(' ')[1]
+                output["email"] = student["email"]
+                output["token"] = student["token"]
+                Output.append(output)
+        html_code = 200
+    else:
+        Output = "No student found"
+        html_code = 400
+    return jsonify({'result': Output}), html_code
+
+@app.route('/users/students/', methods=['POST'])
+@cross_origin(origin=site_url,headers=['Content-Type','Authorization'], supports_credentials=True)
+def send_all_students():
+    users = mongo.db.users
+    students = users.find({"type": "student"})
+    if students:
+        Output = []
+        for student in students:
+            if student['email']!='':
+                msg = Message("Veuillez remplir le questionnaire langues au lien suivant",
+                          sender="no-reply@questionnaire-DLC.com",
+                          recipients=[student['email']])
+                msg.body = "Voici votre lien personnalisé :  \n" + site_url+ "login?token="+student['token']
+                mail.send(msg)
+        html_code = 200
+    else:
+        Output = "No student found"
+        html_code = 400
+    return jsonify({'result': Output}), html_code
+
+@app.route('/admin/students/', methods=['PUT'])
+@cross_origin(origin=site_url,headers=['Content-Type','Authorization'], supports_credentials=True)
+@jwt_required
+def update_all_students():
+    users = mongo.db.users
+    students = users.find({"type": "student"})
+    data = request.get_json(force=True)
+    print(data)
+    for new_student in data:
+
+        if 'token' not in new_student or new_student['token']=='':
+            new_student['token'] = generate_token()
+        empty=False
+        for v in new_student.values():
+            if v=='':
+                print(new_student)
+                empty=True
+        if empty:
+            continue
+
+        student_updated = users.update_one({"email":new_student["email"]}, {"$set" : {
+        "id":get_max_collection_id(users)+1,
+                                                               "name":new_student['first_name']+" "+new_student['last_name'],
+                                                               "email":new_student['email'],
+                                                               "type":"student",
+                                                               "vows":[],
+                                                               "courses":[],
+                                                               "token":new_student['token']}}, upsert=True)
+        print(student_updated)
+
+        if not student_updated:
+            users.insert({"id":get_max_collection_id(users)+1,
+                                                                   "name":new_student['first_name']+" "+new_student['last_name'],
+                                                                   "email":new_student['email'],
+                                                                   "type":"student",
+                                                                   "vows":[],
+                                                                   "courses":[],
+                                                               "token":new_student['token']})
+    for student in students:
+        still_belongs = False
+        for new_student in data:
+            if student["email"] == new_student["email"]:
+                still_belongs = True
+        if not still_belongs:
+            users.delete_one({"email":student["email"]})
+
+
+
+
+    return jsonify({'result': "done"}), 200
 
 @app.route('/users/students/', methods=['PUT'])
-@cross_origin(origin=site_url,headers=['Content-Type','Authorization'])
+@cross_origin(origin=site_url,headers=['Content-Type','Authorization'], supports_credentials=True)
 def add_student():
     users = mongo.db.users
     id = get_max_collection_id(users)+1
@@ -449,7 +550,7 @@ def update_student(student_id):
 
 
 @app.route('/users/students/vows/<student_token>', methods=['POST'])
-@cross_origin(origin=site_url,headers=['Content-Type','Authorization'])
+@cross_origin(origin=site_url,headers=['Content-Type','Authorization'], supports_credentials=True)
 def update_student_vows(student_token):
     users = mongo.db.users
     new_vows = request.get_json(force=True)['vows']
@@ -461,7 +562,8 @@ def update_student_vows(student_token):
         html_code = 200
         msg = Message("Voeux enreistrés",
                   sender="no-reply@questionnaire-DLC.com",
-                  recipients=[student.mail])
+                  recipients=[student['email']])
+        mail.send(msg)
     else:
         output = "Could not add student's vows"
         html_code = 400
@@ -487,8 +589,8 @@ def login_service(token):
 
 
 
-@app.route('/solve-courses/', methods=['POST'])
-@cross_origin(origin=site_url,headers=['Content-Type','Authorization'])
+@app.route('/admin/solve-courses/', methods=['POST'])
+@cross_origin(origin=site_url,headers=['Content-Type','Authorization'], supports_credentials=True)
 def solve_courses():
     students_from_db = mongo.db.users.find({"type" : "student"})
     students = []

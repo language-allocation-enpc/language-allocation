@@ -42,7 +42,7 @@ def write_course(id=-1, name='', language='', creneaux =[], min_students=0, max_
     course["max_students"] = max_students
     app_db.courses.insert_one(course)
 
-write_course(0, "Cours vide", "", [0], 0, 10000) #Le premier cours est le cours "vide"
+write_course(0, "Cours vide", "", [0], 0, 10000)
 write_course(1,"Public Speaking", "Anglais", [1], 5, 15)
 write_course(2,"Talk Like TED", "Anglais", [1], 5, 15)
 write_course(3,"Conversational English", "Anglais", [1], 5, 15)
@@ -152,7 +152,7 @@ def write_student(id=-1, name='', vows=[]):
     student["email"] = ''
     student["token"] = ''.join(random.choices(string.ascii_uppercase +string.ascii_lowercase+ string.digits, k=35))
     app_db.users.insert_one(student)
-for i in range(10):
+for i in range(100):
     vow_1 = vow()
     vow_1.courses = [COURSES[(i)%6],COURSES[(i+1)%6],COURSES[(i+2)%6]]
     print(vow_1.courses)
