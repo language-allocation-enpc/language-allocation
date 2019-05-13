@@ -162,8 +162,9 @@ function vowIsValid(vow, schedules){
     checked_vow_list.sort((vow1, vow2)=>{return vow1.weight-vow2.weight});
     let empty_vow={list: [], weight: checked_vow_list[checked_vow_list.length-1]? (checked_vow_list[checked_vow_list.length-1].weight+100):0} //empty vow is more expensive than the last vow
     if(checked_vow_list.length<NUMBER_VOWS){// when there are not enough vows, the list is filled with empty vows 
+      let length =checked_vow_list.length;
       enough_vows=false;
-      for(let i=0;i<NUMBER_VOWS-checked_vow_list.length; i++){
+      for(let i=0;i<NUMBER_VOWS-length; i++){
         checked_vow_list.push(empty_vow);
       }
     } else { // in any case the last vow is set to empty vow to garantee a solution

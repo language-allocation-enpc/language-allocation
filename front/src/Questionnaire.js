@@ -160,10 +160,11 @@ class Questionnaire extends Component {
       axios.post(url+"users/students/vows/"+this.state.data.token,object_to_send)
       .then(
         (result) => {
-          this.setState({answers_are_sent: true})
+          this.setState({answers_are_sent: true});
+          console.log('ok')
         },
         (error) => {
-          this.setState({answers_are_sent: false})
+          this.setState({answers_are_sent: false});
         }
       );
     }
@@ -535,12 +536,12 @@ class FinalQuestion extends Component {
                    
                   <div className="final-buttons-box" key="final-button-box">
                   <FinalButton text={"Envoyer les réponses"} onClick={this.props.sendAnswers}/>
-                  <FinalButton text={"Annuler le questionnaire"}/>
+                  <FinalButton text={"Retour au questionnaire"} onClick={()=>{this.props.handleStepChange("previous")}}/>
                   </div> ]
               }
               </div>
             </div>
-            {this.props.getAnswersAreSent() ? null : <QuestionFooter handleStepChange={this.props.handleStepChange} getStepList={this.props.getStepList} getStepIndex={this.props.getStepIndex}/>}
+            {this.props.getAnswersAreSent() ? null : null}
           </div>
         );
       }
