@@ -1,0 +1,12 @@
+\babel@toc {french}{}
+\contentsline {section}{\numberline {1}Introduction}{9}{section.1}
+\contentsline {section}{\numberline {2}Description du probl\IeC {\`e}me et \IeC {\'e}laboration du programme d\IeC {\textquoteright }optimisation }{9}{section.2}
+\contentsline {subsection}{\numberline {2.1}Probl\IeC {\'e}matique et contraintes }{9}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Reformulation du probl\IeC {\`e}me et \IeC {\'e}laboration de la strat\IeC {\'e}gie de r\IeC {\'e}solution}{10}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}Formulation math\IeC {\'e}matique du probl\IeC {\`e}me d\IeC {\textquoteright }optimisation}{11}{subsection.2.3}
+\contentsline {section}{\numberline {3}Interface de soumission des v\IeC {\oe }ux et interface DLC }{12}{section.3}
+\contentsline {subsection}{\numberline {3.1}Interface de soumission des v\IeC {\oe }ux}{12}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}}{14}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}}{14}{subsection.3.3}
+\contentsline {section}{\numberline {4}Gestion des donn\IeC {\'e}es et s\IeC {\'e}curisation du site web }{14}{section.4}
+\contentsline {section}{\numberline {5}Conclusion}{14}{section.5}

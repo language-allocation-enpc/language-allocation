@@ -1,0 +1,402 @@
+\documentclass[12pt]{article}
+\usepackage[francais]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage[dvips]{graphicx}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage{makeidx}
+\usepackage{amsfonts,dsfont}
+\usepackage{listings}
+\usepackage{textcomp}
+\usepackage{lmodern} 
+\usepackage{makeidx}
+\usepackage{xcolor}
+\usepackage{color}
+\usepackage{multicol}
+\usepackage{tabularx}
+\usepackage{minitoc}
+
+% Pour les scripts Python
+\usepackage{Style/python_extension}
+
+% Pour les scripts JavaScript
+\usepackage{Style/javascript_extension}
+
+% Pour les scripts Bash
+\usepackage{Style/bash_extension}
+
+% Pour les fichiers XML
+\usepackage{Style/xml_extension}
+
+% Pour les fichiers HTML
+\usepackage{Style/html5_extension}
+
+% Pour les scripts json
+\usepackage{Style/json_extension}
+
+% Pour les notes
+\usepackage[colorinlistoftodos]{todonotes}
+
+% Pour les url
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{caption} % Pour les références en utilisant ces packages
+
+% Pour les figures contenant plusieurs images
+\usepackage[lofdepth,lotdepth]{subfig}
+
+% Pour les notes de bas de page
+\usepackage[bottom]{footmisc}
+
+% Pour le glossaire
+\usepackage{glossaries}
+\makeglossaries
+%\newacronym{API}{API}{\textit{Application Programming Interface}} à mettre en début de document
+%\gls{API} pour citer le mot
+
+% Pour les headers et footers
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[L]{\textbf{Page \thepage}}
+\fancyhead[L]{Ecole Nationale des Ponts et Chaussées – Projet de département Mai 2019}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headheight}{16pt}
+
+% Pour les annexes
+\usepackage[subfigure]{tocloft} % Besoin de l'option subfigure pour ne pas rentrer en conflit avec subfig, car redéfinition des compteurs
+\newcommand{\listappendicesname}{\textbf{\Large Liste des annexes}}
+\newlistof{appendices}{apc}{\listappendicesname}
+\newcommand{\appendices}[1]{\addcontentsline{apc}{appendices}{#1}}
+\newcommand{\newappendix}[1]{\section{#1}\appendices{#1}}
+
+% Pour les marges
+\textwidth=18cm \textheight=23cm \oddsidemargin=-1.00cm
+\evensidemargin=-1.00cm
+\parindent=1cm
+\topmargin=-2cm
+
+% Pour les index
+\usepackage{imakeidx}
+\makeindex[name=auteur,title={Liste des auteurs}]
+\makeindex[name=mot,title={Index des mots clés}]
+%\index[auteur]{einstein} pour mettre l'auteur 'einstein' en index du mot voulu
+
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+
+\DeclareUnicodeCharacter{202F}{\,} 
+
+\begin{document}
+
+%% Acronymes pour le glossaire 
+\newacronym{API}{API}{\textit{Application Programming Interface}, Interface de programmation applicative}
+\newacronym{OSM}{OSM}{OpenStreetMap}
+\newacronym{HTML}{HTML}{\textit{HyperText Markup Language}, "langage de balisage hypertexte"}
+\newacronym{XML}{XML}{\textit{Extensible Markup Language}, "langage de balisage extensible"}
+\newacronym{JSON}{JSON}{\textit{JavaScript Object Notation}, "notation des objets JavaScript"}
+\newacronym{Mo}{Mo}{megaoctets}
+\newacronym{MB}{MB}{MegaBytes}
+\newacronym{kB}{kB}{kiloBytes}
+
+
+\thispagestyle{empty} % Pour ne pas avoir de footer ni de header sur cette page
+
+	\begin{center}
+		
+		{\large{\bf ECOLE DES PONTS PARISTECH}}
+		
+		\medskip
+		
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=6cm]{logoenpc}
+		\end{figure}
+		
+		
+		
+		{\large{\bf PROJET DE DEPARTEMENT IMI 2019}}
+		
+		\vspace{2cm}
+		
+		{\Large{\bf Affectation des langues à l'ENPC}}
+		
+		\vspace{1cm}
+		
+		{\large{Luca Brunod Indrigo, Nathan Godey, Jeffrey Mahou \\ sous la direction de \\ Michaël Karpe \\ Projet réalisé pour le département DLC de l’ENPC}}
+		
+		\vspace{2cm}
+		
+		\newpage
+		
+	\begin{center}
+	    {\large{\bf Remerciements}}
+	\end{center}
+	
+	    \medskip
+	    
+	\begin{flushleft}
+    Nous remercions chaleureusement notre tuteur de stage Michaël Karpe qui nous a suivis tout au long de ce projet. Il a su cadrer notre mission et nous motiver dans les temps difficiles, de plus, il a pu nous préparer au mieux à la présentation finale. 
+
+    Nous remercions également le département DLC qui nous a consacré plusieurs réunions afin de répondre à toutes les questions que nous avons pu nous poser. Plus particulièrement, nous remercions Amokrane Kaddour et Diarietou Coulibaly pour nous avoir expliqué clairement leurs attentes. 
+  \end{flushleft}
+		
+		\newpage
+		
+		\begin{minipage}{16cm}
+			{\normalsize
+				\parindent=0pt
+				{{\bf RESUME} : Notre mission est née d’une plainte des élèves concernant l’attribution des cours de langue. En effet, jusqu’à présent, ceux-ci se distribuaient selon la règle du « premier arrivé premier servi » ce qui entraînait plusieurs problèmes notamment le fait que le serveur n’arrivait pas à supporter la masse de connexion simultanée à la page d’attribution des cours. \\
+
+        Nous devions donc proposer une nouvelle manière d’attribuer les cours de langues basées sur des vœux soumis par les élèves. \\
+        
+        Notre projet consistait donc tout d’abord à développer une interface web pour les élèves de l’école afin qu’ils puissent soumettre des vœux dans leurs cours de langue à choisir.  \\
+        
+        Ensuite, nous devions récupérer ces vœux et optimiser aux mieux l’attribution des cours de langues aux élèves en fonction des contraintes de remplissement (nombres minimal et maximal d’élèves dans un cours) et d’horaires (pas de chevauchement de plusieurs cours pour un même élève) et bien sûr des préférences des élèves. \\
+        
+        Il fallait aussi gérer les données relatives aux élèves et aux cours de langues : Pour les cours de langue, nous avons créé une interface sécurisée uniquement accessible au département DLC afin qu’ils puissent insérer, supprimer ou modifier les cours de langue proposés aux élèves. De même, pour les élèves, nous avons créé une interface qui permet au département DLC d’ajouter chaque élève avec ses informations utiles. \\
+        
+        Enfin, nous avons établi un système permettant d’envoyer à chaque élève un lien personnalisé afin qu’il puisse s’identifier sur la page des choix des vœux de langue. \\
+        }
+				\par}
+		\end{minipage}
+		
+		\vspace{1cm}
+		
+		\begin{minipage}{16cm}
+			{\normalsize
+				\parindent=0pt
+				{{\bf Mots-clés} : Recherche opérationnelle, optimisation, site web }
+				\par}
+		\end{minipage}
+		
+		
+		
+		\newpage
+		
+		\begin{minipage}{16cm}
+			{\normalsize
+				\parindent=0pt
+				{{\bf ABSTRACT} : Our mission was born of a complaint from students about the attribution of language courses. Until now, they were indeed distributed on a  "first come first served" basis which caused several problems including the fact that the server could not support the mass of simultaneous connection to the course allocation website. \\
+
+ 
+        That is why we had to come up with a new way of assigning language courses based on vows submitted by students. \\
+        
+         
+        Therefore, the first step of our project was to develop a web interface for the students of the school so that they can submit vows in their language courses to choose. \\
+        
+         
+        Then, we had to recover these vows and optimize the attribution of the language courses to the students according to the constraints of filling (minimum and maximum numbers of students in a course) and of schedules (no overlapping of several courses for one student) and of course on students’ preferences. \\
+        
+         
+        It was also necessary to manage the data relating to the students and the language courses: For the language courses, we created an secured interface open only to the DLC department so that they could insert, delete or modify the language courses proposed to the students. Similarly, we have created an interface that allows the DLC department to add each student with its useful information.\\
+        
+         
+        Finally, we have established a system that sends each student a custom link so that they can identify themselves on the language choice page. \\
+        }
+				\par}
+		\end{minipage}
+		
+		\vspace{1cm}
+		
+		\begin{minipage}{16cm}
+			{\normalsize
+				\parindent=0pt
+				{{\bf KEYWORDS} : operations research, optimization, web site }
+				\par}
+		\end{minipage}
+		
+	\end{center}
+	
+		\newpage
+		\tableofcontents
+		\newpage
+		\listoftables
+		\newpage
+		\listoffigures
+		\newpage
+		\listofappendices
+	    \newpage
+	
+	\section{Introduction}
+	
+  Notre client, le département langues et culture de l’ENPC nous a demandé d’améliorer le processus d’attributions des cours de langues aux élèves.  \\
+  
+  En effet, celui-ci permettait à chaque étudiant de choisir ses cours de langues selon le principe de “premier arrivé premier servi” (ou “shotgun”). Ce système ne satisfaisait ni les étudiants ni le département mais il avait l’avantage d’être simple et compris facilement (notamment pour les étudiants étrangers). \\
+  
+  Le principal problème de ce système était que le site saturait car tous les étudiants se connectaient au même moment pour choisir leurs cours. Ainsi, si les élèves voulaient obtenir les cours de langues qu’ils souhaitaient, ils devaient souvent se connecter dans la nuit au moment où le site pouvait à nouveau gérer le débit de connections. \\
+  
+  Pour le département des langues, cela n’était pas satisfaisant non plus car beaucoup d’élèves insatisfaits de leur résultat venaient les voir pour essayer de changer leurs cours. \\
+  
+  Notre mission était donc de fournir au DLC une interface simple et compréhensible de tous permettant de recueillir les vœux de chacun concernant les cours de langue et ensuite de distribuer les cours selon un programme d’optimisation maximisant la satisfaction des étudiants. \\
+  
+  Dans une première partie, nous verrons donc comment nous avons construit notre programme d’optimisation afin de satisfaire les choix des élèves. Dans une seconde partie, nous nous concentrerons sur l’interface de soumission des vœux par les élèves et l’interface de modification des cours par le DLC. Dans une dernière partie, nous aborderons la gestion des données et de la sécurité des informations. \\
+    
+    \section{Description du problème et élaboration du programme d’optimisation } 
+      \subsection{Problématique et contraintes }
+    
+      Comme nous l’avons déjà précisé, le but de ce projet était de fournir au Département Langues et Culture (DLC) un outil pour répartir les élèves dans les cours de langues en essayant de satisfaire au mieux chacun d’entre eux.  \\
+
+      À cette problématique s’ajoutent un certain nombre de contraintes imposées par le DLC quant aux affectations. Ces contraintes sont de différentes natures et nous ont été soumises comme suit :  \\
+    
+    \begin{enumerate}
+        \item Contraintes d’effectif : Chaque cours proposé par le DLC a un effectif maximum qui fixe la limite du nombre d’élèves inscrits à ce cours mais aussi un effectif minimum au-dessous duquel le cours ne peut être assuré. Remarquons qu’avec le système de “premier arrivé premier servi”, le respect de la contrainte d’effectif minimum nécessitait invariablement un remaniement des résultats d’affectation a posteriori. 
+        \item Contrainte de chevauchement : Un élève ne peut suivre des cours dont les horaires se chevauchent. 
+        \item Contrainte de parcours : Certains cours sont réservés aux élèves de première année et d’autres aux élèves de deuxième ou troisième année. 
+        \item Contrainte de niveau de langue : Cette contrainte fixe un nombre minimum de cours d’Anglais à suivre en fonction de la note obtenue au TOEIC par l’élève. 
+        \begin{itemize}
+          \item Note inférieure à 650 : L’élève doit suivre au moins deux cours d’Anglais dont deux de type “cours”. 
+          \item Note entre 650 et 785 : L’élève doit suivre au moins deux cours d’Anglais dont au moins un de type “cours”. 
+          \item Note supérieure à 785 : L’élève doit suivre au moins un cours d’Anglais. 
+        \end{itemize}
+    \end{enumerate}
+
+    Il est à noter que cette dernière contrainte est soumise à des exceptions, notamment pour les élèves étrangers. 
+    
+      \subsection{Reformulation du problème et élaboration de la stratégie de résolution}
+
+Avant de songer à une méthode pour résoudre le problème en pratique, il nous a fallu clarifier les objectifs et les contraintes. \\
+
+La problématique en elle-même soulève plusieurs questions. Comment modéliser la “satisfaction” des élèves en vue de la maximiser et sous quelle forme recueillir leurs préférences pour l’évaluer ? Pour ce faire, nous avons pu nous inspirer du travail déjà effectué par notre encadrant dans le cas de la répartition des projets de département de première année. Chaque élève doit classer les différents projets par ordre de préférence, ce qui permet d’associer à chaque projet une pondération propre à l’élève (le poids étant d’autant plus important que le projet est mal classé). L’ensemble des classements est ensuite soumis à un programme d’optimisation linéaire qui a pour objectif de répartir les étudiants dans les projets en respectant des contraintes d’effectif et en minimisant la somme des poids des projets attribués.  \\
+
+En ce qui concerne les contraintes, nous avons constaté qu’elles pouvaient être séparées en deux catégories : \\
+    
+\begin{itemize}
+  \item   Les contraintes propres à chaque élève : contraintes de niveau, contraintes de chevauchement, contrainte de parcours 
+  \item   Les contraintes “globales” : contraintes d’effectifs 
+\end{itemize}
+
+Les premières contraintes ne dépendent que des choix propres de chaque élève et peuvent donc être vérifiées en amont par une interface chargée de collecter les préférences. \\
+
+Les contraintes “globales”, au contraire, nécessitent de confronter les préférences de tous les utilisateurs et doivent donc être intégrées au traitement ultérieur des données recueillies auprès des élèves. \\
+
+Cela nous a conduit à opter pour une méthode de résolution en deux temps :  \\
+
+\begin{itemize}
+  \item Une première étape au cours de laquelle les élèves doivent soumettre leurs préférences à une interface qui se charge de construire une liste de vœux. Chaque vœu est constitué d’un ensemble de cours auquel est associé un poids dépendant des préférences de l’élève (un poids élevé traduit une préférence faible). Les détails du fonctionnement de l’interface et de la génération des vœux seront décrits dans la partie consacrée. 
+  \item Une seconde étape consistant à rassembler les listes de vœux des élèves et à les soumettre à un programme d’optimisation linéaire qui attribue à chaque élève un vœu de sa liste en respectant les contraintes d’effectif et en minimisant la somme totale des poids. 
+\end{itemize}
+
+La première étape sert à la fois à recueillir les préférences des élèves et à faire respecter les premières contraintes, la seconde sert à maximiser la satisfaction et à vérifier les contraintes d’effectifs. \\
+
+Le résultat final fourni au DLC est une liste des cours avec la liste des élèves qui y ont été affectés. \\
+
+    \subsection{Formulation mathématique du problème d’optimisation}
+
+On introduit les notations suivantes :  
+
+\begin{itemize}
+  \item Données : 
+  \begin{itemize}
+    \item $S$ le nombre d'étudiants
+    \item $V$ le nombre de voeux par étudiant
+    \item $C$ le nombre de cours
+    \item $[D_{svc}]_{s \in [\![1, S]\!], \,v \in [\![1, V]\!], \,c \in [\![1, C]\!]} \in \{ 0,1\} ^{S \times V \times C}$ qui indique pour chaque cours $c$ s'il figure dans le voeu $v$ de l'élève $s$
+    \item $[W_{sv}]_{s \in [\![1, S]\!], \,v \in [\![1, V]\!] } \in \mathbb{R}^{S \times V}$ qui donne pour chaque élève $s$ le poids de son voeu $v$
+    \item $[h_c^{max}]_{c \in [\![1, C]\!]} \in \mathbb{N}^C$ les effectifs maximaux des cours
+    \item $[h_c^{min}]_{c \in [\![1, C]\!]} \in \mathbb{N}^C$ les effectifs minimaux des cours
+  \end{itemize}
+  \item Variables : 
+  \begin{itemize}
+    \item $[o_c]_{c \in [\![1, C]\!]} \in\{ 0,1\} ^{C}$ qui indique pour chaque cours $c$ s'il est ouvert
+    \item $[h_c]_{c \in [\![1, C]\!]} \in \mathbb{N}^C$ les effectifs des cours
+    \item $[A_{sv}]_{s \in [\![1, S]\!], \,v \in [\![1, V]\!] } \in\{ 0,1\} ^{S \times V}$ qui indique pour chaque élève $s$ s'il obtient le voeu $v$
+  \end{itemize}
+\end{itemize}
+
+\bigskip 
+
+Le programme d’optimisation linéaire à résoudre s’écrit de la façon suivante :  \\
+
+\begin{align*}
+   &\min \limits_{A \in \{ 0,1\} ^{S \times V}, o \in\{ 0,1\} ^{C}, h \in \mathbb{N}^C} & & \sum \limits_{s \in [\![1, S]\!], v \in [\![1, V]\!]} A_{sv}W_{sv}         & \forall s \in[\![1, S]\!]\\
+   &s.c                                                                                 & & \sum \limits_{v \in [\![1, V]\!]}  A_ {sv} = 1                             & \forall c \in[\![1, C]\!]\\
+   &                                                                                    & & \sum \limits_{s \in [\![1, S]\!], v \in [\![1, V]\!]} A_{sv}D_{svc} = h_c  & \forall c \in[\![1, C]\!]\\
+   &                                                                                    & & h_c  \leq h_c^{max}o_c                                                     & \forall c \in[\![1, C]\!]\\
+   &                                                                                    & & h_c  \geq h_c^{min}o_c                                                     & \forall c \in[\![1, C]\!]\\
+\end{align*}
+
+
+Il convient de remarquer que les contraintes d’intégrité sur les variables booléennes sont indispensables à la résolution numérique pour obtenir une solution valable. \\ 
+
+Dans le cas du problème déjà traité par notre encadrant pour l’attribution des projets de département, la résolution du relâché continu du problème était suffisante car la matrice des contraintes avait la particularité d’être totalement unimodulaire. Le problème que nous avons dû traiter n’avait pas cette particularité, notamment parce qu’une partie de la matrice des contraintes dépend directement des choix des élèves. Le solver que nous utilisons pour la résolution du problème doit donc utiliser des algorithmes plus gourmands en temps de calcul, mais des tests sur des données de taille réelle indiquent que le temps d’exécution est tout à fait raisonnable. \\
+
+	
+  \section{Interface de soumission des vœux et interface DLC }
+    \subsection{Interface de soumission des vœux}
+
+    Le rôle de l’interface de soumission des vœux est d’interroger les élèves sur leurs préférences afin d’en déduire une liste de vœux satisfaisant les contraintes évoquées précédemment qui puisse ensuite être soumise au programme d’optimisation. \\
+
+Cette interface se doit de rester pratique et facile d’utilisation, en particulier, elle ne doit pas demander aux élèves de consacrer un temps trop important au questionnaire. Cependant, pour maximiser les chances d’avoir une solution satisfaisante au programme d’optimisation, le nombre de vœux formulés par chaque élève doit aussi être suffisamment important. Il nous a donc semblé évident que nous ne pouvions demander aux utilisateurs de construire eux même leur liste vœu par vœu, d’autant que la vérification des contraintes, notamment celles de chevauchement, rendrait la tâche fastidieuse. \\
+
+Nous avons donc choisi de programmer une interface permettant de construire une liste de vœux admissibles à partir de simples classements de cours par ordre de préférence. \\
+    
+La première page du questionnaire demande à l’élève (qui est déjà identifié grâce à un lien personnalisé) quelques informations de base :  \\
+
+\begin{itemize}
+  \item L’année d’étude : Cette information permet de filtrer la liste des cours pour ne proposer à l’élève de classer que ceux prévus pour lui et ainsi de respecter les contraintes de parcours. 
+  \item La note au TOEIC : Elle permet d’inviter l’élève à prendre un nombre de cours d’Anglais adapté de façon à respecter la contrainte de niveau. 
+  \item Le nombre de cours d’Anglais souhaité : Cette question permet de connaître le nombre de cours d’Anglais à inclure dans chaque vœu, elle engendre des questions additionnelles si l’élève ne veut en suivre aucun afin de respecter la contrainte d’un cours d’Anglais au minimum. 
+  \item Le nombre de cours de langues différentes de l’Anglais : De même que le précédent, il permet de savoir combien de cours d’autres langues doivent être intégrés aux vœux.
+\end{itemize}
+
+L'étape suivante du questionnaire est une page de consignes qui indique aux utilisateurs comment procéder pour classer les cours. Cette page est adaptée aux réponses aux questions précédentes. \\
+
+L'élève doit ensuite effectuer jusqu’à deux classements : Un pour les cours d’Anglais (si l’élève en a demandé au moins un) et un pour les autres cours (si l’élève en a demandé au moins un). \\
+
+Pour chaque classement, la liste des cours disponibles dans la catégorie concernée est présentée à l’utilisateur. Il peut choisir d’ajouter des cours au classement et supprimer ou réordonner ceux qui y sont déjà. \\
+
+Après le dernier classement, la dernière page du questionnaire propose d’envoyer les réponses ou de retourner en arrière pour les modifier. Un message d’avertissement est affiché dans le cas où le nombre de vœux valides qu’il est possible de construire avec les classements fournis est jugé insuffisant selon un critère fixé.  \\
+
+Chaque classement fourni par l’utilisateur donne d’une part une liste des cours pouvant lui être attribuée et d’autre part ses préférences. Ces préférences sont modélisées en attribuant à chaque cours classé un poids qui augmente quadratiquement selon son rang. \\
+
+Les vœux sont ensuite générés en opérant toutes les combinaisons possibles de cours dans les quantités souhaitées par l’élève. Les vœux comportant des cours incompatibles au niveau des horaires sont éliminés pour respecter la contrainte de chevauchement. Le poids d’un vœu est calculé comme la somme des poids des cours qu’il comprend. \\
+
+Les listes de vœux devant être de taille fixée pour être soumises à l’algorithme d’optimisation, la liste obtenue est tronquée à une longueur fixée en ne gardant que les vœux les moins coûteux.  \\
+
+Certaines précautions sont prises pour garantir que l’optimisation fournisse une solution. Un vœu “vide” (sans aucun cours) est ajouté à la fin de chaque liste de vœux avec un poids très élevé, ce qui garantit toujours une solution admissible tout en minimisant les chances d’attribuer un tel vœu. De plus, un cours “vide” fictif est également ajouté en fin de chaque classement de sorte que, dans le cas d’une configuration très défavorable des demandes des élèves ou d’un nombre de cours classés insuffisant, l’algorithme d’optimisation préfèrera toujours attribuer un ou deux cours de moins que demandé à l’élève plutôt que de ne lui en attribuer aucun. \\
+
+Le choix de distinguer les cours d’Anglais des autres cours lors des classements n’étais pas une évidence de prime abord. Il nous a paru pertinent de procéder ainsi car l’Anglais est la langue la plus représentée en nombre de cours et occupe une place à part en tant que langue presque obligatoire.  De plus, cette approche est particulièrement adaptée au schéma classique “un ou deux cours d’anglais + un ou deux cours de LV2” mais reste suffisamment flexible pour permettre des choix plus atypiques. \\
+
+Si la vérification de certaines des contraintes est imposée à l’utilisateur (contraintes de chevauchement et de parcours), d’autres reposent davantage sur son honnêteté comme la contrainte de niveau. En effet, si l’utilisateur n’a aucunement la possibilité de suivre des cours qui se chevauchent pour des raisons évidentes, il est seulement invité à prendre le nombre de cours d’Anglais correspondant à sa note au TOEIC. \\
+
+L’emploi de cours et de vœux “vides” dans la génération des vœux peut paraître discutable dans la mesure où cela peut être une source majeure d’insatisfaction. Cependant, il faut garder à l’esprit qu’en l’absence de solution admissible, c’est l’ensemble des données issues des questionnaires qui est inexploitable, d’où l’importance de garantir l’existence d’une telle solution. La probabilité que ces vœux soient effectivement attribués aux élèves est très faible si les élèves classent un grand nombre de cours et il paraît en préférable que le DLC intervienne au cas par cas sur un petit nombre d’élèves lésés plutôt que d’être contrainte de soumettre plusieurs fois le questionnaire. \\
+  \subsection{}
+    \subsection{}
+	
+	
+
+  \section{Gestion des données et sécurisation du site web }
+
+	
+  \section{Conclusion}
+
+  Au cours du projet, nous avons significativement divergé du tracé prévu initialement. Les objectifs de base étaient surtout centrés sur le problème d’optimisation et l’idée était plutôt d’intégrer à un programme, éventuellement non linéaire, l’ensemble relativement complexe des contraintes afin de résoudre le problème d’affectation.  \\
+
+  Cependant, comme nous l’avons expliqué, nous avons assez rapidement eu l’idée de diviser les contraintes en deux groupes et de compter sur une interface pour vérifier la majorité d’entre-elles. Cela a beaucoup changé le profil du projet puisque, dès lors, le développement des interfaces et de la base de données associée a pris le pas sur la partie consacrée au problème d’optimisation pur et simple. \\
+  
+  Ainsi, nous nous sommes surtout employés à trouver la solution qui nous semblait la mieux adaptée au problème qui nous était posé et avons pour cela pris des initiatives s’éloignant des voies que nous avions initialement été invités à suivre. Cela est peut-être dû au fait qu’en tant qu’élève, nous avons personnellement été confrontés à l’insatisfaction liée au système en place et n’en étions que plus motivés pour fournir un travail de qualité. \\
+
+    \newpage
+    \printglossaries
+	
+	\newpage 
+	
+	\printindex[mot] % Donne l'index des mots-clés
+	
+	\newpage
+	
+	\printindex[auteur] % Donne l'index des auteurs
+	
+	\newpage
+	
+    
+	\newpage
+
+\bibliographystyle{unsrt}
+\bibliography{biblio.bib}
+
+\end{document}

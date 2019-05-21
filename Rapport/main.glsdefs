@@ -1,0 +1,240 @@
+\ifglsentryexists{API}{}%
+{%
+\gls@defglossaryentry{API}%
+{%
+name={API},%
+sort={API},%
+type={main},%
+first={\protect \textit {Application Programming Interface}, Interface de programmation applicative\glsspace (API)},%
+firstplural={\protect \textit {Application Programming Interface}, Interface de programmation applicative\glsspace (API)},%
+text={API},%
+plural={API},%
+description={\textit {Application Programming Interface}, Interface de programmation applicative},%
+descriptionplural={\textit {Application Programming Interface}, Interface de programmation applicative\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={\protect \textit {Application Programming Interface}, Interface de programmation applicative},%
+longplural={\protect \textit {Application Programming Interface}, Interface de programmation applicative},%
+short={API},%
+shortplural={API},%
+counter={page},%
+parent={},%
+%
+}%
+}%
+\ifglsentryexists{OSM}{}%
+{%
+\gls@defglossaryentry{OSM}%
+{%
+name={OSM},%
+sort={OSM},%
+type={main},%
+first={OpenStreetMap\glsspace (OSM)},%
+firstplural={OpenStreetMap\glsspace (OSM)},%
+text={OSM},%
+plural={OSM},%
+description={OpenStreetMap},%
+descriptionplural={OpenStreetMap\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={OpenStreetMap},%
+longplural={OpenStreetMap},%
+short={OSM},%
+shortplural={OSM},%
+counter={page},%
+parent={},%
+%
+}%
+}%
+\ifglsentryexists{HTML}{}%
+{%
+\gls@defglossaryentry{HTML}%
+{%
+name={HTML},%
+sort={HTML},%
+type={main},%
+first={\protect \textit {HyperText Markup Language}, "langage de balisage hypertexte"\glsspace (HTML)},%
+firstplural={\protect \textit {HyperText Markup Language}, "langage de balisage hypertexte"\glsspace (HTML)},%
+text={HTML},%
+plural={HTML},%
+description={\textit {HyperText Markup Language}, "langage de balisage hypertexte"},%
+descriptionplural={\textit {HyperText Markup Language}, "langage de balisage hypertexte"\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={\protect \textit {HyperText Markup Language}, "langage de balisage hypertexte"},%
+longplural={\protect \textit {HyperText Markup Language}, "langage de balisage hypertexte"},%
+short={HTML},%
+shortplural={HTML},%
+counter={page},%
+parent={},%
+%
+}%
+}%
+\ifglsentryexists{XML}{}%
+{%
+\gls@defglossaryentry{XML}%
+{%
+name={XML},%
+sort={XML},%
+type={main},%
+first={\protect \textit {Extensible Markup Language}, "langage de balisage extensible"\glsspace (XML)},%
+firstplural={\protect \textit {Extensible Markup Language}, "langage de balisage extensible"\glsspace (XML)},%
+text={XML},%
+plural={XML},%
+description={\textit {Extensible Markup Language}, "langage de balisage extensible"},%
+descriptionplural={\textit {Extensible Markup Language}, "langage de balisage extensible"\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={\protect \textit {Extensible Markup Language}, "langage de balisage extensible"},%
+longplural={\protect \textit {Extensible Markup Language}, "langage de balisage extensible"},%
+short={XML},%
+shortplural={XML},%
+counter={page},%
+parent={},%
+%
+}%
+}%
+\ifglsentryexists{JSON}{}%
+{%
+\gls@defglossaryentry{JSON}%
+{%
+name={JSON},%
+sort={JSON},%
+type={main},%
+first={\protect \textit {JavaScript Object Notation}, "notation des objets JavaScript"\glsspace (JSON)},%
+firstplural={\protect \textit {JavaScript Object Notation}, "notation des objets JavaScript"\glsspace (JSON)},%
+text={JSON},%
+plural={JSON},%
+description={\textit {JavaScript Object Notation}, "notation des objets JavaScript"},%
+descriptionplural={\textit {JavaScript Object Notation}, "notation des objets JavaScript"\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={\protect \textit {JavaScript Object Notation}, "notation des objets JavaScript"},%
+longplural={\protect \textit {JavaScript Object Notation}, "notation des objets JavaScript"},%
+short={JSON},%
+shortplural={JSON},%
+counter={page},%
+parent={},%
+%
+}%
+}%
+\ifglsentryexists{Mo}{}%
+{%
+\gls@defglossaryentry{Mo}%
+{%
+name={Mo},%
+sort={Mo},%
+type={main},%
+first={megaoctets\glsspace (Mo)},%
+firstplural={megaoctets\glsspace (Mo)},%
+text={Mo},%
+plural={Mo},%
+description={megaoctets},%
+descriptionplural={megaoctets\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={megaoctets},%
+longplural={megaoctets},%
+short={Mo},%
+shortplural={Mo},%
+counter={page},%
+parent={},%
+%
+}%
+}%
+\ifglsentryexists{MB}{}%
+{%
+\gls@defglossaryentry{MB}%
+{%
+name={MB},%
+sort={MB},%
+type={main},%
+first={MegaBytes\glsspace (MB)},%
+firstplural={MegaBytes\glsspace (MB)},%
+text={MB},%
+plural={MB},%
+description={MegaBytes},%
+descriptionplural={MegaBytes\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={MegaBytes},%
+longplural={MegaBytes},%
+short={MB},%
+shortplural={MB},%
+counter={page},%
+parent={},%
+%
+}%
+}%
+\ifglsentryexists{kB}{}%
+{%
+\gls@defglossaryentry{kB}%
+{%
+name={kB},%
+sort={kB},%
+type={main},%
+first={kiloBytes\glsspace (kB)},%
+firstplural={kiloBytes\glsspace (kB)},%
+text={kB},%
+plural={kB},%
+description={kiloBytes},%
+descriptionplural={kiloBytes\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={kiloBytes},%
+longplural={kiloBytes},%
+short={kB},%
+shortplural={kB},%
+counter={page},%
+parent={},%
+%
+}%
+}%
